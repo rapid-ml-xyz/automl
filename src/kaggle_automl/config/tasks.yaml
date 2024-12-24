@@ -1,15 +1,16 @@
 dataset_task:
   description: >
-    Analyze the Kaggle dataset mentioned in the query. Focus on:
-    1. Understanding the dataset's purpose and scope from its documentation
-    2. Identifying the key evaluation metrics used
-    3. Determining the dataset's potential applications and limitations
+    Download the Kaggle dataset mentioned and provide key insights. You must:
+    1. Download and properly save the dataset
+    2. Confirm the download location and success
+    3. Extract key information from the dataset documentation
+    4. Identify evaluation metrics and potential use cases
   expected_output: >
-    A concise assessment of the dataset including:
-    - Dataset reference and download location
-    - Key points from the dataset introduction
-    - Relevant evaluation metrics
-    - Initial recommendations for dataset usage
+    A complete dataset acquisition report including:
+    - Download confirmation and file location
+    - Dataset reference and key documentation points
+    - Evaluation metrics
+    - Initial assessment for usage
   agent: dataset_assessor
 
 research_task:

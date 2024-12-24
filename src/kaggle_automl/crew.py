@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from .tools import kaggle_download_tool, kaggle_reference_extractor_tool
 
 # If you want to run a snippet of code before or after the crew starts, 
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -33,6 +33,7 @@ class KaggleAutoml:
 		return Agent(
 			config=self.agents_config['dataset_assessor'],
 			llm=self.openai_llm,
+			tools=[kaggle_reference_extractor_tool.KaggleReferenceExtractorTool(), kaggle_download_tool.KaggleDownloadTool()],
 			verbose=True
 		)
 
