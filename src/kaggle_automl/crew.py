@@ -1,4 +1,7 @@
-from crewai import Agent, Crew, Process, Task
+import os
+from dotenv import load_dotenv
+
+from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
 # If you want to run a snippet of code before or after the crew starts, 
@@ -15,12 +18,20 @@ class KaggleAutoml:
 	agents_config = 'config/agents.yaml'
 	tasks_config = 'config/tasks.yaml'
 
+	load_dotenv()
+	openai_llm = LLM(
+		model=os.getenv("OPENAI_MODEL"),
+		api_key=os.getenv("OPENAI_API_KEY"),
+		api_base="https://api.openai.com/v1"
+	)
+
 	# If you would like to add tools to your agents, you can learn more about it here:
 	# https://docs.crewai.com/concepts/agents#agent-tools
 	@agent
 	def researcher(self) -> Agent:
 		return Agent(
 			config=self.agents_config['researcher'],
+			llm=self.openai_llm,
 			verbose=True
 		)
 
@@ -28,6 +39,7 @@ class KaggleAutoml:
 	def reporting_analyst(self) -> Agent:
 		return Agent(
 			config=self.agents_config['reporting_analyst'],
+			llm=self.openai_llm,
 			verbose=True
 		)
 
