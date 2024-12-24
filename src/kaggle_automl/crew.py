@@ -8,6 +8,7 @@ from crewai.project import CrewBase, agent, crew, task
 # you can use the @before_kickoff and @after_kickoff decorators
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
+
 @CrewBase
 class KaggleAutoml:
 	"""KaggleAutoml crew"""
@@ -28,6 +29,14 @@ class KaggleAutoml:
 	# If you would like to add tools to your agents, you can learn more about it here:
 	# https://docs.crewai.com/concepts/agents#agent-tools
 	@agent
+	def dataset_assessor(self) -> Agent:
+		return Agent(
+			config=self.agents_config['dataset_assessor'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
+	@agent
 	def researcher(self) -> Agent:
 		return Agent(
 			config=self.agents_config['researcher'],
@@ -46,6 +55,12 @@ class KaggleAutoml:
 	# To learn more about structured task outputs, 
 	# task dependencies, and task callbacks, check out the documentation:
 	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
+	@task
+	def dataset_task(self) -> Task:
+		return Task(
+			config=self.tasks_config['dataset_task'],
+		)
+
 	@task
 	def research_task(self) -> Task:
 		return Task(

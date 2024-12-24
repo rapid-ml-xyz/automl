@@ -2,7 +2,7 @@
 import sys
 import warnings
 
-from kaggle_automl.crew import KaggleAutoml
+from .crew import KaggleAutoml
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -11,12 +11,13 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 # Replace with inputs you want to test with, it will automatically
 # interpolate any tasks and agents information
 
+
 def run():
     """
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs'
+        'topic': 'Can you analyze the netflix/netflix-prize-data dataset for me?'
     }
     KaggleAutoml().crew().kickoff(inputs=inputs)
 
@@ -34,6 +35,7 @@ def train():
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
 
+
 def replay():
     """
     Replay the crew execution from a specific task.
@@ -43,6 +45,7 @@ def replay():
 
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
+
 
 def test():
     """

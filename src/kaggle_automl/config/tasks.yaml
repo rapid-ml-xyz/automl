@@ -1,3 +1,17 @@
+dataset_task:
+  description: >
+    Analyze the Kaggle dataset mentioned in the query. Focus on:
+    1. Understanding the dataset's purpose and scope from its documentation
+    2. Identifying the key evaluation metrics used
+    3. Determining the dataset's potential applications and limitations
+  expected_output: >
+    A concise assessment of the dataset including:
+    - Dataset reference and download location
+    - Key points from the dataset introduction
+    - Relevant evaluation metrics
+    - Initial recommendations for dataset usage
+  agent: dataset_assessor
+
 research_task:
   description: >
     Conduct a thorough research about {topic}
