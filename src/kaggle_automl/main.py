@@ -17,7 +17,7 @@ def run():
     Run the crew.
     """
     inputs = {
-        'topic': 'Can you solve the hopesb/student-depression-dataset kaggle challenge?'
+        'topic': 'Can you analyze the hopesb/student-depression-dataset for me?'
     }
     KaggleAutoml().crew().kickoff(inputs=inputs)
 
