@@ -1,6 +1,6 @@
-dataset_task:
+dataset_acquisition_task:
   description: >
-    Download the Kaggle dataset mentioned and provide key insights. You must:
+    Download the Kaggle dataset mentioned. You must:
     1. Download and properly save the dataset
     2. Confirm the download location and success
     3. Extract key information from the dataset documentation
@@ -10,7 +10,6 @@ dataset_task:
     - Download confirmation and file location
     - Dataset reference and key documentation points
     - Evaluation metrics
-    - Initial assessment for usage
   agent: dataset_assessor
 
 research_task:
