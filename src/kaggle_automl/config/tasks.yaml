@@ -11,3 +11,155 @@ dataset_acquisition_task:
     - Dataset reference and key documentation points
     - Evaluation metrics
   agent: dataset_acquisition_specialist
+
+retrieval_augmented_planning_task:
+  description: >
+    Follow these instructions and do not forget them:
+    - Ensure that your plan is up-to-date with current state-of-the-art knowledge.
+    - Ensure that your plan is based on the requirements and objectives described in the above
+      JSON object.
+    - Ensure that your plan is designed for AI agents instead of human experts. These agents
+      are capable of conducting machine learning and artificial intelligence research.
+    - Ensure that your plan is self-contained with sufficient instructions to be executed by
+      the AI agents.
+    - Ensure that your plan includes all the key points and instructions (from handling data to
+      modeling) so that the AI agents can successfully implement them. Do NOT directly write the code.
+    - Ensure that your plan completely include the end-to-end process of machine learning or
+      artificial intelligence model development pipeline in detail (i.e., from data
+      retrieval to model training and evaluation) when applicable based on the given requirements.
+  expected_output: >
+    Devise an end-to-end actionable plan according to the user’s
+    requirements described in the following JSON object.
+    ‘‘‘json
+    {user_requirements}
+    ‘‘‘
+    Here is a list of past experience cases and knowledge written by an human expert for a
+    relevant task: {plan_knowledge}
+  agent: senior_project_manager
+
+plan_revision_task:
+  description: >
+    Follow these instructions and do not forget them:
+    - Ensure that your plan is up-to-date with current state-of-the-art knowledge.
+    - Ensure that your plan is based on the requirements and objectives described in the above
+      JSON object.
+    - Ensure that your plan is designed for AI agents instead of human experts. These agents
+      are capable of conducting machine learning and artificial intelligence research.
+    - Ensure that your plan is self-contained with sufficient instructions to be executed by
+      the AI agents.
+    - Ensure that your plan includes all the key points and instructions (from handling data to
+      modeling) so that the AI agents can successfully implement them. Do NOT directly write the code.
+    - Ensure that your plan completely include the end-to-end process of machine learning or
+      artificial intelligence model development pipeline in detail (i.e., from data
+      retrieval to model training and evaluation) when applicable based on the given requirements.
+  expected_output: >
+    Revise and rethink {num2words(n_plans)} different end-to-end actionable plans
+    according to the user’s requirements described in the JSON object below.
+    ‘‘‘json
+    {user_requirements}
+    ‘‘‘
+    Please use to the following findings and insights summarized from the previously failed plans.
+    Try as much as you can to avoid the same failure again.
+    {fail_rationale}
+  agent: senior_project_manager
+
+data_decomposition_task:
+  description: >
+    As a proficient data scientist, summarize the following plan given by the senior AutoML
+    project manager according to the user’s requirements and your expertise in data science.
+    # User’s Requirements
+    ‘‘‘json
+    {user_requirements}
+    ‘‘‘
+    # Project Plan
+    {plan}
+  expected_output: >
+    The summary of the plan should enable you to fulfill your responsibilities as the answers
+    to the following questions by focusing on the data manipulation and analysis.
+    1. How to retrieve or collect the dataset(s)?
+    2. How to preprocess the retrieved dataset(s)?
+    3. How to efficiently augment the dataset(s)?
+    4. How to extract and understand the underlying characteristics of the dataset(s)?
+    Note that you should not perform data visualization because you cannot see it. Make sure
+    that another data scientist can exactly reproduce the results based on your summary.
+  agent: data_scientist
+
+plan_decomposition_task:
+  description: >
+    Summarize the following plan given by the senior AutoML project manager according to
+    the user’s requirements, your expertise in machine learning, and the outcomes from data scientist.
+    **User’s Requirements**
+    ‘‘‘json
+    {user_requirements}
+    ‘‘‘
+    **Project Plan**
+    {project_plan}
+    **Explanations and Results from the Data Scientist**
+    {data_result}
+  expected_output: >
+    The summary of the plan should enable you to fulfill your responsibilities as the answers
+    to the following questions by focusing on the data manipulation and analysis.
+    1. How to retrieve or collect the dataset(s)?
+    2. How to preprocess the retrieved dataset(s)?
+    3. How to efficiently augment the dataset(s)?
+    4. How to extract and understand the underlying characteristics of the dataset(s)?
+    Note that you should not perform data visualization because you cannot see it. Make sure
+    that another data scientist can exactly reproduce the results based on your summary.
+  agent: machine_learning_research_engineer
+
+pseudo_data_analysis_task:
+  description: >
+    Explain **detailed** steps for data manipulation and analysis parts by executing
+    the following machine learning development plan.
+    # Plan
+    {decomposed_data_plan}
+    # Potential Source of Dataset
+    {available_sources}
+    Make sure that your explanation follows these instructions:
+    - All of your explanation must be self-contained without using any placeholder to ensure
+      that other data scientists can exactly reproduce all the steps, but do not include any code.
+    - Include how and where to retrieve or collect the data.
+    - Include how to preprocess the data and which tools or libraries are used for the preprocessing.
+    - Include how to do the data augmentation with details and names.
+    - Include how to extract and understand the characteristics of the data.
+    - Include reasons why each step in your explanations is essential to effectively complete the plan.
+  expected_output: >
+    Note that you should not perform data visualization because you cannot see it. Make sure to
+    focus only on the data part as it is your expertise. Do not conduct or perform anything regarding
+    modeling or training. After complete the explanations, explicitly specify the (expected)
+    outcomes and results both quantitative and qualitative of your explanations.
+  agent: data_scientist
+
+model_search_and_hpo_task:
+  description: >
+    Explain **detailed** steps for modeling and optimization parts by executing the following
+    machine learning development plan with the goal of finding top-{k} candidate models/algorithms.
+    # Suggested Plan
+    {decomposed_model_plan}
+    # Available Model Source
+    {available_sources}
+    Make sure that your explanation for finding the top-{k} high-performance models or
+    algorithms follows these instructions:
+    - All of your explanations must be self-contained without using any placeholder to ensure
+      that other machine learning research engineers can exactly reproduce all the steps,
+      but do not include any code.
+    - Include how and where to retrieve or find the top-{k} well-performing models/algorithms.
+    - Include how to optimize the hyperparamters of the candidate models or algorithms by
+      clearly specifying which hyperparamters are optimized in detail.
+    - Corresponding to each hyperparamter, explicitly include the actual numerical value that
+      you think it is the optimal value for the given dataset and machine learning task.
+    - Include how to extract and understand the characteristics of the candidate models or
+      algorithms, such as their computation complexity, memory usage, and inference latency.
+      This part is not related to visualization and interpretability.
+    - Include reasons why each step in your explanations is essential to effectively complete
+      the plan.
+  expected_output: >
+    Make sure to focus only on the modeling part as it is your expertise. Do not conduct or
+    perform anything regarding data manipulation or analysis. After complete the explanations,
+    explicitly specify the names and (expected) quantitative performance using relevant
+    numerical performance and complexity metrics (e.g., number of parameters, FLOPs, model size,
+    training time, inference speed, and so on) of the {num2words(k)} candidate models/algorithms
+    potentially to be the optimal model below. Do not use any placeholder for the quantitative performance.
+    If you do not know the exact values, please use the knowledge and expertise you have to
+    estimate those performance and complexity values.
+  agent: data_scientist
