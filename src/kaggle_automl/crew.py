@@ -19,8 +19,18 @@ class KaggleAutoml:
 		api_base="https://api.openai.com/v1"
 	)
 
+	# Manager Agent -- hierarchical crew
 	@agent
-	def dataset_assessor(self) -> Agent:
+	def senior_project_manager(self) -> Agent:
+		return Agent(
+			allow_delegation=True,
+			config=self.agents_config['senior_project_manager'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
+	@agent
+	def dataset_acquisition_specialist(self) -> Agent:
 		return Agent(
 			allow_delegation=False,
 			config=self.agents_config['dataset_acquisition_specialist'],
@@ -29,6 +39,42 @@ class KaggleAutoml:
 				kaggle_download_tool.KaggleDownloadTool(),
 				kaggle_metadata_extractor_tool.KaggleMetadataExtractorTool()
 			],
+			verbose=True
+		)
+
+	@agent
+	def assistant_project_manager(self) -> Agent:
+		return Agent(
+			allow_delegation=False,
+			config=self.agents_config['assistant_project_manager'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
+	@agent
+	def data_scientist(self) -> Agent:
+		return Agent(
+			allow_delegation=False,
+			config=self.agents_config['data_scientist'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
+	@agent
+	def machine_learning_research_engineer(self) -> Agent:
+		return Agent(
+			allow_delegation=False,
+			config=self.agents_config['machine_learning_research_engineer'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
+	@agent
+	def machine_learning_operations_engineer(self) -> Agent:
+		return Agent(
+			allow_delegation=False,
+			config=self.agents_config['machine_learning_operations_engineer'],
+			llm=self.openai_llm,
 			verbose=True
 		)
 

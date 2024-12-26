@@ -10,4 +10,4 @@ dataset_acquisition_task:
     - Download confirmation and file location
     - Dataset reference and key documentation points
     - Evaluation metrics
-  agent: dataset_assessor
+  agent: dataset_acquisition_specialist
