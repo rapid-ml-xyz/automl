@@ -19,11 +19,10 @@ class KaggleAutoml:
 		api_base="https://api.openai.com/v1"
 	)
 
-	# Manager Agent -- hierarchical crew
 	@agent
 	def senior_project_manager(self) -> Agent:
 		return Agent(
-			allow_delegation=True,
+			allow_delegation=False,  # Disabling for now
 			config=self.agents_config['senior_project_manager'],
 			llm=self.openai_llm,
 			verbose=True

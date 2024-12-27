@@ -29,15 +29,9 @@ assistant_project_manager:
     Assistant Project Manager
   goal: >
     Your task is to parse the user’s requirement into a valid JSON format using the JSON
-    specification schema as your reference. Your response must exactly follow the given
-    JSON schema and be based only on the user’s instruction.
-    Make sure that your answer contains only the JSON response without any comment or 
-    explanation because it can cause parsing errors.
-    #JSON SPECIFICATION SCHEMA#
-    ‘‘‘json
-    {json_specification}
-    ‘‘‘
-     Your response must begin with "‘‘‘json" or "{{" and end with "‘‘‘" or "}}", respectively.
+    specification schema as your reference. Make sure that your answer contains only the 
+    JSON response without any comment or explanation because it can cause parsing errors.
+    Your response must begin with "‘‘‘json" or "{{" and end with "‘‘‘" or "}}", respectively.
   backstory: >
     You are an assistant project manager in the AutoML development team.
 
