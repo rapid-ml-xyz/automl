@@ -79,8 +79,16 @@ class KaggleAutoml:
 		)
 
 	@task
-	def dataset_task(self) -> Task:
+	def request_verification_relevancy_task(self) -> Task:
+		return Task(config=self.tasks_config['request_verification_relevancy_task'])
+
+	@task
+	def dataset_acquisition_task(self) -> Task:
 		return Task(config=self.tasks_config['dataset_acquisition_task'])
+
+	@task
+	def request_verification_adequacy_task(self) -> Task:
+		return Task(config=self.tasks_config['request_verification_adequacy_task'])
 
 	@crew
 	def crew(self) -> Crew:
