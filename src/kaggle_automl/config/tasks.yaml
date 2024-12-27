@@ -7,7 +7,7 @@ request_verification_relevancy_task:
 
 dataset_acquisition_task:
   description: >
-    Download the Kaggle dataset mentioned. You must:
+    {topic} Download the Kaggle dataset mentioned. You must:
     1. Download and properly save the dataset
     2. Confirm the download location and success
     3. Extract key information from the dataset documentation
@@ -18,8 +18,6 @@ dataset_acquisition_task:
     - Dataset reference and key documentation points
     - Evaluation metrics
   agent: dataset_acquisition_specialist
-  context:
-    - request_verification_relevancy_task
 
 request_verification_adequacy_task:
   description: >
@@ -37,7 +35,6 @@ request_verification_adequacy_task:
     completing such missing information.
   agent: senior_project_manager
   context:
-    - request_verification_relevancy_task
     - dataset_acquisition_task
 
 retrieval_augmented_planning_task:
