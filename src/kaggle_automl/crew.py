@@ -89,6 +89,11 @@ class KaggleAutoml:
 	def request_verification_adequacy_task(self) -> Task:
 		return Task(config=self.tasks_config['request_verification_adequacy_task'])
 
+	# Might be redundant, since it's only pretty-printing the dataset_acquisition_task output
+	@task
+	def request_parsing_task(self) -> Task:
+		return Task(config=self.tasks_config['request_parsing_task'])
+
 	@crew
 	def crew(self) -> Crew:
 		"""Creates the KaggleAutoml crew"""

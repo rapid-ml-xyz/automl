@@ -37,6 +37,19 @@ request_verification_adequacy_task:
   context:
     - dataset_acquisition_task
 
+request_parsing_task:
+  description: >
+    Parse and validate the user's dataset requirements and preferences into a structured JSON format 
+    that adheres to the AutoML pipeline's input specifications, ensuring all mandatory fields are 
+    present and properly formatted.
+  expected_output: >
+    A valid JSON object containing the parsed user requirements with standardized field names, 
+    data types, and nested structures that match the JSON schema specification for dataset 
+    configuration in the AutoML system.
+  agent: assistant_project_manager
+  context:
+    - dataset_acquisition_task
+
 retrieval_augmented_planning_task:
   description: >
     Follow these instructions and do not forget them:
