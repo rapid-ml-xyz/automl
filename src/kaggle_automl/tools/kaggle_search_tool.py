@@ -34,18 +34,7 @@ class KaggleSearchTool(BaseTool):
             api.authenticate()
 
             search_term = f"{user_task} {user_domain}"
-            notebooks = api.kernel_list(search=search_term, page_size=max_results)
+            return api.kernels_list(search=search_term, page_size=max_results)
 
-            results = []
-            for notebook in notebooks:
-                results.append({
-                    'title': notebook.title,
-                    'url': f"https://www.kaggle.com/{notebook.ref}",
-                    'author': notebook.author,
-                    'votes': notebook.totalVotes,
-                    'description': notebook.description
-                })
-
-            return str(results)
         except Exception as e:
             return f"Error searching Kaggle notebooks: {str(e)}"

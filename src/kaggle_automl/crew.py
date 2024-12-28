@@ -2,7 +2,13 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from .tools import kaggle_download_tool, kaggle_metadata_extractor_tool
+from .tools import (
+	ArxivSearchTool,
+	KaggleDownloadTool,
+	KaggleMetadataExtractorTool,
+	KaggleSearchTool,
+	PapersWithCodeSearchTool
+)
 
 
 @CrewBase
@@ -25,6 +31,7 @@ class KaggleAutoml:
 			allow_delegation=False,  # Disabling for now
 			config=self.agents_config['senior_project_manager'],
 			llm=self.openai_llm,
+			tools=[ArxivSearchTool(), KaggleSearchTool(), PapersWithCodeSearchTool()],
 			verbose=True
 		)
 
@@ -34,10 +41,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['dataset_acquisition_specialist'],
 			llm=self.openai_llm,
-			tools=[
-				kaggle_download_tool.KaggleDownloadTool(),
-				kaggle_metadata_extractor_tool.KaggleMetadataExtractorTool()
-			],
+			tools=[KaggleDownloadTool(), KaggleMetadataExtractorTool()],
 			verbose=True
 		)
 
@@ -93,6 +97,10 @@ class KaggleAutoml:
 	@task
 	def request_parsing_task(self) -> Task:
 		return Task(config=self.tasks_config['request_parsing_task'])
+
+	@task
+	def retrieval_augmented_planning_task(self) -> Task:
+		return Task(config=self.tasks_config['retrieval_augmented_planning_task'])
 
 	@crew
 	def crew(self) -> Crew:

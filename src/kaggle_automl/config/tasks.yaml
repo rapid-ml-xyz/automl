@@ -2,6 +2,7 @@ request_verification_relevancy_task:
   description: >
     Is the following statement relevant to machine learning or artificial intelligence?
     ‘{topic}‘
+    No need to use any tools -- just answer this based on your judgement.
   expected_output: Answer only ’Yes’ or ’No’
   agent: senior_project_manager
 
@@ -28,6 +29,7 @@ request_verification_adequacy_task:
     requirements, e.g., problem and brief dataset descriptions.
     You do not need to check every details of the requirements. You must also answer ’yes’ even
     though it lacks detailed and specific information.
+    No need to use any tools -- just answer this based on your judgement.
   expected_output: >
     Please answer with this format: ‘a ’yes’ or ’no’ answer; your reasons for the answer‘ by
     using ’;’ to separate between the answer and its reasons.
@@ -66,14 +68,10 @@ retrieval_augmented_planning_task:
       artificial intelligence model development pipeline in detail (i.e., from data
       retrieval to model training and evaluation) when applicable based on the given requirements.
   expected_output: >
-    Devise an end-to-end actionable plan according to the user’s
-    requirements described in the following JSON object.
-    ‘‘‘json
-    {user_requirements}
-    ‘‘‘
-    Here is a list of past experience cases and knowledge written by an human expert for a
-    relevant task: {plan_knowledge}
+    Devise an end-to-end actionable plan according to the user’s requirements.
   agent: senior_project_manager
+  context:
+    - dataset_acquisition_task
 
 plan_revision_task:
   description: >
