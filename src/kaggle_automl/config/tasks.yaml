@@ -112,10 +112,9 @@ data_decomposition_task:
   expected_output: >
     The summary of the plan should enable you to fulfill your responsibilities as the answers
     to the following questions by focusing on the data manipulation and analysis.
-    1. How to retrieve or collect the dataset(s)?
-    2. How to preprocess the retrieved dataset(s)?
-    3. How to efficiently augment the dataset(s)?
-    4. How to extract and understand the underlying characteristics of the dataset(s)?
+    1. How to preprocess the retrieved dataset(s)?
+    2. How to efficiently augment the dataset(s)?
+    3. How to extract and understand the underlying characteristics of the dataset(s)?
     Note that you should not perform data visualization because you cannot see it. Make sure
     that another data scientist can exactly reproduce the results based on your summary.
   agent: data_scientist

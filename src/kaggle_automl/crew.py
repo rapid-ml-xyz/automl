@@ -28,9 +28,10 @@ class KaggleAutoml:
 	@agent
 	def senior_project_manager(self) -> Agent:
 		return Agent(
-			allow_delegation=False,  # Disabling for now
+			allow_delegation=False,  # Disabling for now, since it isn't actually meant to manage other agents
 			config=self.agents_config['senior_project_manager'],
 			llm=self.openai_llm,
+			# Search results are terrible!
 			tools=[ArxivSearchTool(), KaggleSearchTool(), PapersWithCodeSearchTool()],
 			verbose=True
 		)
