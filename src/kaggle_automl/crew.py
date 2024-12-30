@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from crewai_tools import CSVSearchTool
 from .tools import (
 	ArxivSearchTool,
 	KaggleDownloadTool,
@@ -61,6 +62,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['data_scientist'],
 			llm=self.openai_llm,
+			tools=[CSVSearchTool()],
 			verbose=True
 		)
 
@@ -102,6 +104,14 @@ class KaggleAutoml:
 	@task
 	def retrieval_augmented_planning_task(self) -> Task:
 		return Task(config=self.tasks_config['retrieval_augmented_planning_task'])
+
+	@task
+	def data_decomposition_task(self) -> Task:
+		return Task(config=self.tasks_config['data_decomposition_task'])
+
+	@task
+	def plan_decomposition_task(self) -> Task:
+		return Task(config=self.tasks_config['plan_decomposition_task'])
 
 	@crew
 	def crew(self) -> Crew:

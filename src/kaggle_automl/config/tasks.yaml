@@ -103,12 +103,6 @@ data_decomposition_task:
   description: >
     As a proficient data scientist, summarize the following plan given by the senior AutoML
     project manager according to the user’s requirements and your expertise in data science.
-    # User’s Requirements
-    ‘‘‘json
-    {user_requirements}
-    ‘‘‘
-    # Project Plan
-    {plan}
   expected_output: >
     The summary of the plan should enable you to fulfill your responsibilities as the answers
     to the following questions by focusing on the data manipulation and analysis.
@@ -118,29 +112,27 @@ data_decomposition_task:
     Note that you should not perform data visualization because you cannot see it. Make sure
     that another data scientist can exactly reproduce the results based on your summary.
   agent: data_scientist
+  context:
+    - retrieval_augmented_planning_task
+    - dataset_acquisition_task
 
 plan_decomposition_task:
   description: >
     Summarize the following plan given by the senior AutoML project manager according to
     the user’s requirements, your expertise in machine learning, and the outcomes from data scientist.
-    **User’s Requirements**
-    ‘‘‘json
-    {user_requirements}
-    ‘‘‘
-    **Project Plan**
-    {project_plan}
-    **Explanations and Results from the Data Scientist**
-    {data_result}
   expected_output: >
     The summary of the plan should enable you to fulfill your responsibilities as the answers
     to the following questions by focusing on the data manipulation and analysis.
-    1. How to retrieve or collect the dataset(s)?
-    2. How to preprocess the retrieved dataset(s)?
-    3. How to efficiently augment the dataset(s)?
-    4. How to extract and understand the underlying characteristics of the dataset(s)?
+    1. How to preprocess the retrieved dataset(s)?
+    2. How to efficiently augment the dataset(s)?
+    3. How to extract and understand the underlying characteristics of the dataset(s)?
     Note that you should not perform data visualization because you cannot see it. Make sure
     that another data scientist can exactly reproduce the results based on your summary.
   agent: machine_learning_research_engineer
+  context:
+    - data_decomposition_task
+    - retrieval_augmented_planning_task
+    - dataset_acquisition_task
 
 pseudo_data_analysis_task:
   description: >
