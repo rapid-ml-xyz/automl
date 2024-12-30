@@ -5,6 +5,7 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import CSVSearchTool
 from .tools import (
 	ArxivSearchTool,
+	HuggingFaceSearchTool,
 	KaggleDownloadTool,
 	KaggleMetadataExtractorTool,
 	KaggleSearchTool,
@@ -66,14 +67,13 @@ class KaggleAutoml:
 			verbose=True
 		)
 
-	# TODO: Create and add hugging face discovery tool
 	@agent
 	def machine_learning_research_engineer(self) -> Agent:
 		return Agent(
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_research_engineer'],
 			llm=self.openai_llm,
-			tools=[KaggleSearchTool()],
+			tools=[KaggleSearchTool(), HuggingFaceSearchTool()],
 			verbose=True
 		)
 
