@@ -66,12 +66,14 @@ class KaggleAutoml:
 			verbose=True
 		)
 
+	# TODO: Create and add hugging face discovery tool
 	@agent
 	def machine_learning_research_engineer(self) -> Agent:
 		return Agent(
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_research_engineer'],
 			llm=self.openai_llm,
+			tools=[KaggleSearchTool()],
 			verbose=True
 		)
 
@@ -112,6 +114,14 @@ class KaggleAutoml:
 	@task
 	def plan_decomposition_task(self) -> Task:
 		return Task(config=self.tasks_config['plan_decomposition_task'])
+
+	@task
+	def pseudo_data_analysis_task(self) -> Task:
+		return Task(config=self.tasks_config['pseudo_data_analysis_task'])
+
+	@task
+	def model_search_and_hpo_task(self) -> Task:
+		return Task(config=self.tasks_config['model_search_and_hpo_task'])
 
 	@crew
 	def crew(self) -> Crew:
