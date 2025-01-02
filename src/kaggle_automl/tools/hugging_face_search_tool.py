@@ -1,8 +1,9 @@
 from crewai.tools import BaseTool
-from typing import Type, List, Dict, Union
+from typing import Type, Dict
 from pydantic import BaseModel, Field
 from huggingface_hub import HfApi, ModelCard
 import json
+import requests
 
 
 class ModelSearchInput(BaseModel):
@@ -30,14 +31,32 @@ class HuggingFaceSearchTool(BaseTool):
         super().__init__()
         self._api = HfApi()
 
+    def _sanitize_model_id(self, model_id: str) -> str:
+        return model_id.rstrip('.')
+
+    def _request_model_read_me(self, model_id: str) -> str:
+        url = f"https://huggingface.co/{model_id}/resolve/main/README.md"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.text
+        else:
+            return ""
+
     def _get_model_card(self, model_id: str) -> Dict:
         try:
-            model_info = self._api.model_info(model_id)
-            card = ModelCard.load(model_id)
-            card_data = card.data
+            sanitized_model_id = self._sanitize_model_id(model_id)
+            model_info = self._api.model_info(sanitized_model_id)
+
+            try:
+                card = ModelCard.load(sanitized_model_id)
+                card_data = card.data.to_dict()
+            except Exception:
+                card_data = {}
+
+            model_read_me = self._request_model_read_me(sanitized_model_id)
 
             return {
-                "model_id": model_id,
+                "model_id": sanitized_model_id,
                 "model_info": {
                     "downloads": model_info.downloads,
                     "likes": model_info.likes,
@@ -46,25 +65,14 @@ class HuggingFaceSearchTool(BaseTool):
                     "last_modified": str(model_info.lastModified),
                     "author": model_info.author,
                 },
-                "model_card": {
-                    "description": card_data.get("description", "Not available"),
-                    "language": card_data.get("language", []),
-                    "license": card_data.get("license", "Not specified"),
-                    "limitations": card_data.get("limitations", "Not specified"),
-                    "intended_use": card_data.get("intended_use", "Not specified"),
-                    "training_data": card_data.get("training_data", "Not specified"),
-                    "evaluation_data": card_data.get("evaluation_data", "Not specified"),
-                    "metrics": card_data.get("metrics", {}),
-                    "dataset_tags": card_data.get("dataset_tags", []),
-                }
+                "model_card_metadata": card_data,
+                "model_read_me": model_read_me
             }
 
         except Exception as e:
             return {
                 "model_id": model_id,
-                "error": str(e),
-                "model_info": {},
-                "model_card": {}
+                "error": str(e)
             }
 
     def _get_model_cards(self, models) -> str:
