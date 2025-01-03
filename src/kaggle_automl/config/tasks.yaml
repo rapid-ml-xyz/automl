@@ -186,6 +186,16 @@ model_search_and_hpo_task:
   context:
     - plan_decomposition_task
 
+code_generation_task:
+  description: >
+    Generate high quality python code leveraging the approaches & instructions provided 
+    in the reports & summaries. The end goal is to have a full stack ML pipeline.
+  agent: machine_learning_operations_engineer
+  context:
+    - dataset_acquisition_task
+    - pseudo_data_analysis_task
+    - model_search_and_hpo_task
+
 execution_verification_task:
   description: >
     Given the proposed solution and user’s requirements, please carefully check and verify

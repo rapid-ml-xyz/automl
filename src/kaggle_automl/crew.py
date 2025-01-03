@@ -11,6 +11,7 @@ from .tools import (
 	KaggleSearchTool,
 	PapersWithCodeSearchTool
 )
+from .utils import load_template
 
 
 @CrewBase
@@ -122,6 +123,16 @@ class KaggleAutoml:
 	@task
 	def model_search_and_hpo_task(self) -> Task:
 		return Task(config=self.tasks_config['model_search_and_hpo_task'])
+
+	@task
+	def code_generation_task(self) -> Task:
+		template_path = "src/kaggle_automl/templates/skeleton_python_script.txt"
+		file_content = load_template(template_path)
+		escaped_file_content = file_content.replace("{", "{{").replace("}", "}}")
+		return Task(
+			config=self.tasks_config['code_generation_task'],
+			expected_output=f"Generate a python script consistent with this template: \n {escaped_file_content}"
+		)
 
 	@crew
 	def crew(self) -> Crew:
