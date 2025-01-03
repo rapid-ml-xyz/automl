@@ -189,13 +189,17 @@ model_search_and_hpo_task:
 code_generation_task:
   description: >
     Generate high quality python code leveraging the approaches & instructions provided 
-    in the reports & summaries. The end goal is to have a full stack ML pipeline.
+    in the reports & summaries. The end goal is to have a full stack ML pipeline. 
+    Be careful about not duplicating variable names, and don't provide any summaries. 
+    I just want code.
   agent: machine_learning_operations_engineer
+  output_file: code.py
   context:
     - dataset_acquisition_task
     - pseudo_data_analysis_task
     - model_search_and_hpo_task
 
+# Irrelevant for now -- flying with zero-shot approach for MVP
 execution_verification_task:
   description: >
     Given the proposed solution and user’s requirements, please carefully check and verify
@@ -210,6 +214,7 @@ execution_verification_task:
   expected_output: Answer only ’Pass’ or ’Fail’
   agent: machine_learning_operations_engineer
 
+# Irrelevant for now -- flying with zero-shot approach for MVP
 implementation_verification_task:
   description: >
     As the project manager, please carefully verify whether the given Python code and results

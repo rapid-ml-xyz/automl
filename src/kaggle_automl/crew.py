@@ -20,12 +20,18 @@ class KaggleAutoml:
 
 	agents_config = 'config/agents.yaml'
 	tasks_config = 'config/tasks.yaml'
-
 	load_dotenv()
+
 	openai_llm = LLM(
 		model=os.getenv("OPENAI_MODEL"),
 		api_key=os.getenv("OPENAI_API_KEY"),
 		api_base="https://api.openai.com/v1"
+	)
+
+	anthropic_llm = LLM(
+		model=os.getenv("ANTHROPIC_MODEL"),
+		api_key=os.getenv("ANTHROPIC_API_KEY"),
+		temperature=0.7
 	)
 
 	@agent
@@ -83,7 +89,7 @@ class KaggleAutoml:
 		return Agent(
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_operations_engineer'],
-			llm=self.openai_llm,
+			llm=self.anthropic_llm,
 			verbose=True
 		)
 
