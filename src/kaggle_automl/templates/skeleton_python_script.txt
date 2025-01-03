@@ -110,6 +110,7 @@ def main():
     return processed_data, model, deployable_model, url_endpoint, model_performance, model_complexity
 
 if __name__ == "__main__":
-    _processed_data, _model, _deployable_model, _url_endpoint, _model_performance, _model_complexity = main()
-    print("Model Performance on Test Set:", _model_performance)
-    print("Model Complexity:", _model_complexity)
+    processed_data_global, model_global, deployable_model_global, url_endpoint_global, /
+        model_performance_global, model_complexity_global = main()
+    print("Model Performance on Test Set:", model_performance_global)
+    print("Model Complexity:", model_complexity_global)

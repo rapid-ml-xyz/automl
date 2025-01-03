@@ -9,11 +9,11 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from imblearn.over_sampling import SMOTE
-import xgboost as xgb
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import gradio as gr
+from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 # Define GPU location
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -29,16 +29,17 @@ np.random.seed(SEED_VALUE)
 device_type = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Path for saving and loading dataset
-DATASET_DIRECTORY = "./datasets/hopesb_student-depression-dataset"
+DATASET_DIR = "_experiments/datasets"
+DATA_FILE_PATH = os.path.join(DATASET_DIR, "student_depression_dataset.csv")
 
 
-class CustomDataset(torch.utils.data.Dataset):
+class DepressionDataset(Dataset):
     def __init__(self, features, labels):
         self.features = torch.FloatTensor(features)
         self.labels = torch.LongTensor(labels)
-    
+        
     def __len__(self):
-        return len(self.features)
+        return len(self.labels)
     
     def __getitem__(self, idx):
         return self.features[idx], self.labels[idx]
@@ -46,183 +47,132 @@ class CustomDataset(torch.utils.data.Dataset):
 
 def preprocess_data():
     """Data preprocessing and feature engineering."""
-    # Load dataset
-    raw_data = pd.read_csv(f"{DATASET_DIRECTORY}/student_depression.csv")
+    # Load the dataset
+    depression_df = pd.read_csv(DATA_FILE_PATH)
     
     # Handle missing values
-    numeric_columns = raw_data.select_dtypes(include=['float64', 'int64']).columns
-    categorical_columns = raw_data.select_dtypes(include=['object']).columns
-    
-    for num_col in numeric_columns:
-        raw_data[num_col].fillna(raw_data[num_col].mean(), inplace=True)
-    
-    for cat_col in categorical_columns:
-        raw_data[cat_col].fillna(raw_data[cat_col].mode()[0], inplace=True)
+    depression_df_cleaned = depression_df.dropna()
     
     # Encode categorical variables
-    label_encoders = {}
-    for cat_col in categorical_columns:
-        label_encoders[cat_col] = LabelEncoder()
-        raw_data[cat_col] = label_encoders[cat_col].fit_transform(raw_data[cat_col])
+    label_encoder_gender = LabelEncoder()
+    label_encoder_city = LabelEncoder()
     
-    # Create combined pressure feature
-    raw_data['combined_pressure'] = raw_data['Academic Pressure'] + raw_data['Work Pressure']
+    depression_df_cleaned['Gender_encoded'] = label_encoder_gender.fit_transform(depression_df_cleaned['Gender'])
+    depression_df_cleaned['City_encoded'] = label_encoder_city.fit_transform(depression_df_cleaned['City'])
     
-    # Standardize numerical features
-    scaler_object = StandardScaler()
-    raw_data[numeric_columns] = scaler_object.fit_transform(raw_data[numeric_columns])
+    # Select features for modeling
+    feature_columns = ['Age', 'Gender_encoded', 'City_encoded', 'CGPA', 'Sleep_Duration']
+    target_column = 'Depression_Status'
     
     # Prepare features and target
-    target_column = 'Depression_Status'
-    feature_columns = [col for col in raw_data.columns if col != target_column]
+    X_features = depression_df_cleaned[feature_columns].values
+    y_target = depression_df_cleaned[target_column].values
     
-    X_data = raw_data[feature_columns].values
-    y_data = raw_data[target_column].values
+    # Scale features
+    feature_scaler = StandardScaler()
+    X_scaled = feature_scaler.fit_transform(X_features)
     
     # Apply SMOTE for class balancing
-    smote_processor = SMOTE(random_state=SEED_VALUE)
-    X_balanced, y_balanced = smote_processor.fit_resample(X_data, y_data)
+    smote_oversampler = SMOTE(random_state=SEED_VALUE)
+    X_balanced, y_balanced = smote_oversampler.fit_resample(X_scaled, y_target)
     
-    processed_data = {
-        'X': X_balanced,
-        'y': y_balanced,
-        'feature_names': feature_columns,
-        'label_encoders': label_encoders,
-        'scaler': scaler_object
-    }
-    
-    return processed_data
+    return X_balanced, y_balanced
 
 
-def create_data_loaders(X_data, y_data, batch_size=32):
-    """Create train, validation, and test data loaders."""
-    # Split into train, validation, and test sets
-    X_temp, X_test, y_temp, y_test = train_test_split(
-        X_data, y_data, test_size=0.1, random_state=SEED_VALUE
+def create_model():
+    """Create the neural network model."""
+    depression_classifier = nn.Sequential(
+        nn.Linear(5, 64),
+        nn.ReLU(),
+        nn.Dropout(0.3),
+        nn.Linear(64, 32),
+        nn.ReLU(),
+        nn.Dropout(0.2),
+        nn.Linear(32, 2)
     )
-    X_train, X_valid, y_train, y_valid = train_test_split(
-        X_temp, y_temp, test_size=0.2, random_state=SEED_VALUE
-    )
-    
-    # Create datasets
-    train_dataset = CustomDataset(X_train, y_train)
-    valid_dataset = CustomDataset(X_valid, y_valid)
-    test_dataset = CustomDataset(X_test, y_test)
-    
-    # Create data loaders
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True
-    )
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, shuffle=False
-    )
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=False
-    )
-    
-    return train_loader, valid_loader, test_loader
+    return depression_classifier
 
 
-def train_model(model, train_loader, valid_loader, epochs=10):
+def train_model(model, train_loader, valid_loader, num_epochs=10):
     """Train and optimize model."""
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    model.to(device_type)
+    criterion_loss = nn.CrossEntropyLoss()
+    optimizer_adam = optim.Adam(model.parameters(), lr=0.001)
     
-    best_valid_loss = float('inf')
-    
-    for epoch in range(epochs):
+    for epoch_idx in range(num_epochs):
         model.train()
         train_loss = 0.0
-        
         for batch_features, batch_labels in train_loader:
             batch_features, batch_labels = batch_features.to(device_type), batch_labels.to(device_type)
             
-            optimizer.zero_grad()
+            optimizer_adam.zero_grad()
             outputs = model(batch_features)
-            loss = criterion(outputs, batch_labels)
+            loss = criterion_loss(outputs, batch_labels)
             loss.backward()
-            optimizer.step()
+            optimizer_adam.step()
             
             train_loss += loss.item()
-        
-        # Validation
-        model.eval()
-        valid_loss = 0.0
-        with torch.no_grad():
-            for batch_features, batch_labels in valid_loader:
-                batch_features, batch_labels = batch_features.to(device_type), batch_labels.to(device_type)
-                outputs = model(batch_features)
-                loss = criterion(outputs, batch_labels)
-                valid_loss += loss.item()
-        
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'best_model.pth')
-    
-    # Load best model
-    model.load_state_dict(torch.load('best_model.pth'))
+            
     return model
 
 
 def evaluate_model(model, test_loader):
     """Evaluate model performance and complexity."""
     model.eval()
-    y_true_list = []
-    y_pred_list = []
+    all_predictions = []
+    all_labels = []
+    
     inference_times = []
     
     with torch.no_grad():
         for batch_features, batch_labels in test_loader:
-            batch_features, batch_labels = batch_features.to(device_type), batch_labels.to(device_type)
+            batch_features = batch_features.to(device_type)
             
             start_time = time.time()
             outputs = model(batch_features)
-            inference_time = time.time() - start_time
+            end_time = time.time()
             
-            _, predicted = torch.max(outputs, 1)
+            inference_times.append(end_time - start_time)
             
-            y_true_list.extend(batch_labels.cpu().numpy())
-            y_pred_list.extend(predicted.cpu().numpy())
-            inference_times.append(inference_time)
+            _, predicted = torch.max(outputs.data, 1)
+            all_predictions.extend(predicted.cpu().numpy())
+            all_labels.extend(batch_labels.cpu().numpy())
     
-    performance_scores = {
-        'ACC': accuracy_score(y_true_list, y_pred_list),
-        'F1': f1_score(y_true_list, y_pred_list)
+    performance_metrics = {
+        'ACC': accuracy_score(all_labels, all_predictions),
+        'F1': f1_score(all_labels, all_predictions)
     }
     
-    complexity_scores = {
+    complexity_metrics = {
         'avg_inference_time': np.mean(inference_times),
-        'model_size_mb': os.path.getsize('best_model.pth') / (1024 * 1024)
+        'model_size_mb': os.path.getsize('model.pt') / (1024 * 1024)
     }
     
-    return performance_scores, complexity_scores
+    return performance_metrics, complexity_metrics
 
 
-def prepare_model_for_deployment():
+def prepare_model_for_deployment(model):
     """Prepare model for deployment."""
-    model = torch.load('best_model.pth')
+    model.eval()
+    torch.save(model.state_dict(), 'model.pt')
+    return model
+
+
+def predict_depression(age, gender, city, cgpa, sleep_duration):
+    """Make depression prediction for Gradio interface."""
+    model = create_model()
+    model.load_state_dict(torch.load('model.pt'))
     model.eval()
     
-    # Convert to TorchScript
-    example_input = torch.randn(1, model.input_size)
-    traced_model = torch.jit.trace(model, example_input)
-    torch.jit.save(traced_model, 'deployable_model.pt')
-    
-    return traced_model
-
-
-def predict_depression(input_features):
-    """Make prediction using the deployed model."""
-    model = torch.jit.load('deployable_model.pt')
-    input_tensor = torch.FloatTensor(input_features).unsqueeze(0)
+    # Prepare input
+    input_data = torch.FloatTensor([[age, gender, city, cgpa, sleep_duration]])
     
     with torch.no_grad():
-        output = model(input_tensor)
+        output = model(input_data)
         probability = torch.softmax(output, dim=1)
         prediction = torch.argmax(probability, dim=1)
     
-    return {"Depression_Risk": bool(prediction.item()),
-            "Confidence": float(probability[0][prediction].item())}
+    return "Depressed" if prediction.item() == 1 else "Not Depressed"
 
 
 def deploy_model():
@@ -230,71 +180,55 @@ def deploy_model():
     interface = gr.Interface(
         fn=predict_depression,
         inputs=[
-            gr.inputs.Number(label="Age"),
-            gr.inputs.Number(label="Sleep Duration"),
-            gr.inputs.Number(label="Academic Pressure"),
-            gr.inputs.Number(label="Work Pressure"),
-            # Add other input features as needed
+            gr.Number(label="Age"),
+            gr.Number(label="Gender (0: Female, 1: Male)"),
+            gr.Number(label="City Code"),
+            gr.Number(label="CGPA"),
+            gr.Number(label="Sleep Duration (hours)")
         ],
-        outputs=gr.outputs.JSON(),
-        title="Student Depression Prediction",
-        description="Predict depression risk based on student characteristics"
+        outputs=gr.Label(label="Depression Status"),
+        title="Student Depression Predictor"
     )
     
-    url_endpoint = interface.launch(share=True)
-    return url_endpoint
-
-
-class DepressionPredictor(nn.Module):
-    def __init__(self, input_size):
-        super().__init__()
-        self.input_size = input_size
-        self.layers = nn.Sequential(
-            nn.Linear(input_size, 128),
-            nn.ReLU(),
-            nn.Dropout(0.3),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Dropout(0.2),
-            nn.Linear(64, 2)
-        )
-    
-    def forward(self, x):
-        return self.layers(x)
+    return interface.launch(share=True)
 
 
 def main():
-    """Main function to execute the text classification pipeline."""
-    # Step 1: Preprocess data
-    processed_data = preprocess_data()
+    """Main function to execute the depression classification pipeline."""
+    # Preprocess data
+    X_processed, y_processed = preprocess_data()
     
-    # Step 2: Create data loaders
-    train_loader, valid_loader, test_loader = create_data_loaders(
-        processed_data['X'], 
-        processed_data['y']
-    )
+    # Split data
+    X_train, X_temp, y_train, y_temp = train_test_split(X_processed, y_processed, test_size=0.3, random_state=SEED_VALUE)
+    X_valid, X_test, y_valid, y_test = train_test_split(X_temp, y_temp, test_size=0.33, random_state=SEED_VALUE)
     
-    # Step 3: Initialize model
-    input_size = processed_data['X'].shape[1]
-    model = DepressionPredictor(input_size).to(device_type)
+    # Create data loaders
+    train_dataset = DepressionDataset(X_train, y_train)
+    valid_dataset = DepressionDataset(X_valid, y_valid)
+    test_dataset = DepressionDataset(X_test, y_test)
     
-    # Step 4: Train model
-    trained_model = train_model(model, train_loader, valid_loader)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=32)
+    test_loader = DataLoader(test_dataset, batch_size=32)
     
-    # Step 5: Evaluate model
+    # Create and train model
+    depression_model = create_model()
+    trained_model = train_model(depression_model, train_loader, valid_loader)
+    
+    # Evaluate model
     model_performance, model_complexity = evaluate_model(trained_model, test_loader)
     
-    # Step 6: Prepare for deployment
-    deployable_model = prepare_model_for_deployment()
+    # Prepare for deployment
+    deployable_model = prepare_model_for_deployment(trained_model)
     
-    # Step 7: Deploy model
+    # Deploy model
     url_endpoint = deploy_model()
     
-    return (processed_data, trained_model, deployable_model, 
-            url_endpoint, model_performance, model_complexity)
+    return (X_processed, y_processed), trained_model, deployable_model, url_endpoint, model_performance, model_complexity
 
 
 if __name__ == "__main__":
-    _processed_data, _model, _deployable_model, _url_endpoint, _model_performance, _model_complexity = main()
-    print("Model Performance on Test Set:", _model_performance)
-    print("Model Complexity:", _model_complexity)
+    processed_data_global, model_global, deployable_model_global, url_endpoint_global, \
+        model_performance_global, model_complexity_global = main()
+    print("Model Performance on Test Set:", model_performance_global)
+    print("Model Complexity:", model_complexity_global)
