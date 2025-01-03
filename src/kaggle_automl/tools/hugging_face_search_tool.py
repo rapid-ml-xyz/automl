@@ -10,7 +10,7 @@ class ModelSearchInput(BaseModel):
     """Input schema for searching models."""
     query: str = Field(
         ...,
-        description="Search query describing the problem or approach you're looking for"
+        description="Keywords (<3) related to the problem or approach"
     )
     limit: int = Field(
         default=5,
