@@ -190,10 +190,11 @@ code_generation_task:
   description: >
     Generate high quality python code leveraging the approaches & instructions provided 
     in the reports & summaries. The end goal is to have a full stack ML pipeline. 
-    Be careful about not duplicating variable names, and don't provide any summaries. 
-    I just want code.
+    Every variable name in the entire file must be unique, regardless of scope
+    Do not provide any summaries. I just want code. 
+    The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
-  output_file: code.py
+  output_file: src/kaggle_automl/outputs/code.py
   context:
     - dataset_acquisition_task
     - pseudo_data_analysis_task
