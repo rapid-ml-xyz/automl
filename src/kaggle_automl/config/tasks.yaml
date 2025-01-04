@@ -221,7 +221,9 @@ code_evaluation_task:
     - code_generation_task
 
 code_execution_task:
-  description: Execute the outputted python file. You can use the CodeInterpreterTool.
+  description: > 
+    Execute the outputted python file.
+    You must extract the libraries_used from the top of the outputted file.
   expected_output: Verbatim output of the code execution.
   agent: machine_learning_operations_engineer
   context:

@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import CodeInterpreterTool, CSVSearchTool, DirectoryReadTool
+from crewai_tools import CSVSearchTool, DirectoryReadTool
 from .tools import (
 	ArxivSearchTool,
 	CsvPreviewTool,
@@ -91,9 +91,10 @@ class KaggleAutoml:
 	def machine_learning_operations_engineer(self) -> Agent:
 		return Agent(
 			allow_delegation=False,
+			allow_code_execution=True,
 			config=self.agents_config['machine_learning_operations_engineer'],
 			llm=self.anthropic_llm,
-			tools=[CodeInterpreterTool(), CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool()],
+			tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool()],
 			verbose=True
 		)
 
