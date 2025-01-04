@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import CSVSearchTool, DirectoryReadTool
+from crewai_tools import CSVSearchTool, DirectoryReadTool, FileReadTool
 from .tools import (
 	ArxivSearchTool,
 	FileOperationTool,
@@ -10,7 +10,8 @@ from .tools import (
 	KaggleDownloadTool,
 	KaggleMetadataExtractorTool,
 	KaggleSearchTool,
-	PapersWithCodeSearchTool
+	PapersWithCodeSearchTool,
+	PWDTool
 )
 from .utils import load_template
 
@@ -52,7 +53,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['dataset_acquisition_specialist'],
 			llm=self.openai_llm,
-			tools=[DirectoryReadTool(), FileOperationTool(), KaggleDownloadTool(), KaggleMetadataExtractorTool()],
+			tools=[DirectoryReadTool(), FileOperationTool(), KaggleDownloadTool(), KaggleMetadataExtractorTool(), PWDTool()],
 			verbose=True
 		)
 
@@ -71,7 +72,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['data_scientist'],
 			llm=self.openai_llm,
-			tools=[CSVSearchTool(), DirectoryReadTool()],
+			tools=[CSVSearchTool(), DirectoryReadTool(), FileReadTool(), PWDTool()],
 			verbose=True
 		)
 
@@ -91,7 +92,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_operations_engineer'],
 			llm=self.anthropic_llm,
-			tools=[CSVSearchTool(), DirectoryReadTool()],
+			tools=[CSVSearchTool(), DirectoryReadTool(), FileReadTool()],
 			verbose=True
 		)
 

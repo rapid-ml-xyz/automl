@@ -16,8 +16,8 @@ dataset_acquisition_task:
     5. Identify evaluation metrics, target variable(s), and potential use cases
   expected_output: >
     A complete dataset acquisition report including:
-    - Download confirmation and file location
-    - Dataset reference and key documentation points
+    - Download confirmation and absolute path of file location. You may use the PWDTool for this.
+    - Absolute dataset reference and key documentation points. You may use the PWDTool for this.
     - Target variable
     - Evaluation metrics
   agent: dataset_acquisition_specialist
@@ -105,6 +105,7 @@ data_decomposition_task:
   description: >
     As a proficient data scientist, summarize the following plan given by the senior AutoML
     project manager according to the user’s requirements and your expertise in data science.
+    Never load the entire CSV to understand it, you will run out of memory. Just leverage the CSVSearchTool for queries.
   expected_output: >
     The summary of the plan should enable you to fulfill your responsibilities as the answers
     to the following questions by focusing on the data manipulation and analysis.
@@ -140,6 +141,7 @@ pseudo_data_analysis_task:
   description: >
     Explain **detailed** steps for data manipulation and analysis parts by executing
     the following machine learning development plan.
+    Never load the entire CSV to understand it, you will run out of memory. Just leverage the CSVSearchTool for queries.
     Make sure that your explanation follows these instructions:
     - All of your explanation must be self-contained without using any placeholder to ensure
       that other data scientists can exactly reproduce all the steps, but do not include any code.
@@ -194,7 +196,8 @@ code_generation_task:
   description: >
     Generate high quality python code leveraging the approaches & instructions provided 
     in the reports & summaries. The end goal is to have a full stack ML pipeline. 
-    Only load & understand the first 10 rows of the CSV -- you can extract the column names from this.
+    Load & understand ONLY the first 10 rows of the CSV -- you can extract the column names from this.
+    Never load the entire CSV to understand it, you will run out of memory.
     Every variable name in the entire file must be unique, regardless of scope
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
@@ -209,7 +212,8 @@ code_evaluation_task:
   description: >
     Evaluate the file saved as output.py -- identify potential bugs & loopholes in the code.
     Do a dry-run for the specified dataset, validating the column names, generated features and file imports. 
-    Only load & understand the first 10 rows of the CSV -- you can extract the column names from this.
+    Load & understand ONLY the first 10 rows of the CSV -- you can extract the column names from this. 
+    Never load the entire CSV to understand it, you will run out of memory.
     You may use the CSV search tool for this. Fix the issues, but try not to make major changes.
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
@@ -221,9 +225,9 @@ code_evaluation_task:
 
 code_execution_task:
   description: >
-    Execute the file saved as output.py. Don't use any tools. 
-    Install any missing dependencies or configurations.
-  expected_output: A short paragraph detailing the model performance on test set & model complexity
+    Execute the file saved as output.py. Don't use any tools. Run using `python output.py`
+    Do not make any assumptions about the output. If it throws an error then communicate that to the user.
+  expected_output: Output of the command `python output.py`
   agent: machine_learning_operations_engineer
 
 # Unused for MVP

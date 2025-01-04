@@ -81,8 +81,7 @@ machine_learning_operations_engineer:
     4. Write efficient Python codes to train/finetune the retrieved model.
     5. Write suitable Python codes to prepare the trained model for deployment. This step may
        include model compression and conversion according to the target inference platform.
-    6. Write Python codes to build the web application demo using the Gradio library.
-    7. Run the model evaluation using the given Python functions and summarize the results for
+    6. Run the model evaluation using the given Python functions and summarize the results for
        validation against the user’s requirements.
   backstory: >
     You are the world’s best MLOps engineer of an automated machine learning project (AutoML)
