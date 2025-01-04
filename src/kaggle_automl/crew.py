@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import CSVSearchTool
+from crewai_tools import CSVSearchTool, DirectorySearchTool
 from .tools import (
 	ArxivSearchTool,
 	HuggingFaceSearchTool,
@@ -51,7 +51,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['dataset_acquisition_specialist'],
 			llm=self.openai_llm,
-			tools=[KaggleDownloadTool(), KaggleMetadataExtractorTool()],
+			tools=[DirectorySearchTool(), KaggleDownloadTool(), KaggleMetadataExtractorTool()],
 			verbose=True
 		)
 
@@ -70,7 +70,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['data_scientist'],
 			llm=self.openai_llm,
-			tools=[CSVSearchTool()],
+			tools=[CSVSearchTool(), DirectorySearchTool()],
 			verbose=True
 		)
 
@@ -90,6 +90,7 @@ class KaggleAutoml:
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_operations_engineer'],
 			llm=self.anthropic_llm,
+			tools=[CSVSearchTool(), DirectorySearchTool()],
 			verbose=True
 		)
 
@@ -148,6 +149,10 @@ class KaggleAutoml:
 			config=self.tasks_config['code_generation_task'],
 			expected_output=f"Generate a python script consistent with this template: \n {escaped_file_content}"
 		)
+
+	@task
+	def code_evaluation_task(self) -> Task:
+		return Task(config=self.tasks_config['code_evaluation_task'])
 
 	@task
 	def code_execution_task(self) -> Task:

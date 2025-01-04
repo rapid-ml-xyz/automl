@@ -159,7 +159,9 @@ model_search_and_hpo_task:
   description: >
     Explain **detailed** steps for modeling and optimization parts by executing the following
     machine learning development plan with the goal of finding top-k candidate models/algorithms.
-    Make sure that your explanation for finding the top-k high-performance models or
+    Do not use any model readily available on HuggingFace. 
+    Rather, take inspiration from their implementation to build your own.
+    Make sure that your explanation for finding the top-k foundational high-performance models or
     algorithms follows these instructions:
     - All of your explanations must be self-contained without using any placeholder to ensure
       that other machine learning research engineers can exactly reproduce all the steps,
@@ -195,20 +197,29 @@ code_generation_task:
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
-  output_file: code.py
+  output_file: output.py
   context:
     - dataset_acquisition_task
     - pseudo_data_analysis_task
     - model_search_and_hpo_task
 
-code_execution_task:
+code_evaluation_task:
   description: >
-    Execute the file saved as code.py, without making any major updates to it.
-    Install any missing dependencies or configurations.
-  expected_output: A short paragraph detailing the model performance on test set & model complexity
+    Evaluate the file saved as output.py -- identify potential bugs & loopholes in the code.
+    Do a dry-run for the specified dataset, validating the column names & generated features. 
+    You may use the CSV search tool for this. Fix the issues, but try not to make major changes.
+    Do not provide any summaries. I just want code. 
+    The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
+  expected_output: An updated output.py
+  output_file: output.py
   context:
     - code_generation_task
+
+code_execution_task:
+  description: Execute the file saved as output.py. Install any missing dependencies or configurations.
+  expected_output: A short paragraph detailing the model performance on test set & model complexity
+  agent: machine_learning_operations_engineer
 
 # Unused for MVP
 solution_submission_task:
