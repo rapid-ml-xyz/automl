@@ -93,6 +93,15 @@ class KaggleAutoml:
 			verbose=True
 		)
 
+	@agent
+	def solution_supplier(self) -> Agent:
+		return Agent(
+			allow_delegation=False,
+			config=self.agents_config['solution_supplier'],
+			llm=self.openai_llm,
+			verbose=True
+		)
+
 	@task
 	def request_verification_relevancy_task(self) -> Task:
 		return Task(config=self.tasks_config['request_verification_relevancy_task'])
@@ -139,6 +148,10 @@ class KaggleAutoml:
 			config=self.tasks_config['code_generation_task'],
 			expected_output=f"Generate a python script consistent with this template: \n {escaped_file_content}"
 		)
+
+	@task
+	def code_execution_task(self) -> Task:
+		return Task(config=self.tasks_config['code_execution_task'])
 
 	@crew
 	def crew(self) -> Crew:

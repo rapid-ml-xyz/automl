@@ -201,6 +201,15 @@ code_generation_task:
     - pseudo_data_analysis_task
     - model_search_and_hpo_task
 
+code_execution_task:
+  description: >
+    Execute the file saved as code.py, without making any major updates to it.
+    Install any missing dependencies or configurations.
+  expected_output: A short paragraph detailing the model performance on test set & model complexity
+  agent: machine_learning_operations_engineer
+  context:
+    - code_generation_task
+
 # Unused for MVP
 solution_submission_task:
   description: >
