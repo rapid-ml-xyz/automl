@@ -10,9 +10,10 @@ dataset_acquisition_task:
   description: >
     {topic} Download the Kaggle dataset mentioned. You must:
     1. Download and properly save the dataset
-    2. Confirm the download location and success
-    3. Extract key information from the dataset documentation
-    4. Identify evaluation metrics, target variable(s), and potential use cases
+    2. Scan the downloaded folder for CSV files using the DirectoryReadTool and rename all files to snake case 
+    3. Confirm the download location and success
+    4. Extract key information from the dataset documentation
+    5. Identify evaluation metrics, target variable(s), and potential use cases
   expected_output: >
     A complete dataset acquisition report including:
     - Download confirmation and file location
