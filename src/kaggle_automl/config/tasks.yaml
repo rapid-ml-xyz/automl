@@ -195,11 +195,21 @@ code_generation_task:
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
-  output_file: src/kaggle_automl/outputs/code.py
+  output_file: code.py
   context:
     - dataset_acquisition_task
     - pseudo_data_analysis_task
     - model_search_and_hpo_task
+
+# Unused for MVP
+solution_submission_task:
+  description: >
+    Submit solution files to Kaggle competitions, ensuring proper file validation, 
+    accurate competition references, and clear submission messaging.
+  expected_output: Kaggle submission metrics & response
+  agent: solution_supplier
+  context:
+    - code_generation_task
 
 # Irrelevant for now -- flying with zero-shot approach for MVP
 execution_verification_task:
