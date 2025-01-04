@@ -1,59 +1,38 @@
 #!/usr/bin/env python
-import sys
 import warnings
+import argparse
 
 from .crew import KaggleAutoml
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+
+def parse_args():
+    """
+    Parse command line arguments.
+    """
+    parser = argparse.ArgumentParser(description='KaggleAutoML CLI')
+    parser.add_argument('command', choices=['run'], help='Command to execute')
+    parser.add_argument('--topic', type=str, required=False, help='Topic for analysis')
+    return parser.parse_args()
 
 
-def run():
+def run(topic):
     """
     Run the crew.
     """
-    inputs = {'topic': 'Can you analyze hopesb/student-depression-dataset for me?'}
+    inputs = {'topic': topic}
     KaggleAutoml().crew().kickoff(inputs=inputs)
 
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs"
-    }
-    try:
-        KaggleAutoml().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+def main():
+    args = parse_args()
 
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+    if args.command == 'run':
+        run(args.topic)
+    else:
+        raise Exception("Invalid command")
 
 
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        KaggleAutoml().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs"
-    }
-    try:
-        KaggleAutoml().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+if __name__ == '__main__':
+    main()

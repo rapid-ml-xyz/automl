@@ -12,11 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-kaggle_automl = "kaggle_automl.main:run"
-run_crew = "kaggle_automl.main:run"
-train = "kaggle_automl.main:train"
-replay = "kaggle_automl.main:replay"
-test = "kaggle_automl.main:test"
+rapidml = "kaggle_automl.main:main"
 
 [build-system]
 requires = ["hatchling"]
