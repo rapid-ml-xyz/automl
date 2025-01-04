@@ -194,6 +194,7 @@ code_generation_task:
   description: >
     Generate high quality python code leveraging the approaches & instructions provided 
     in the reports & summaries. The end goal is to have a full stack ML pipeline. 
+    Only load & understand the first 10 rows of the CSV -- you can extract the column names from this.
     Every variable name in the entire file must be unique, regardless of scope
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
@@ -207,7 +208,8 @@ code_generation_task:
 code_evaluation_task:
   description: >
     Evaluate the file saved as output.py -- identify potential bugs & loopholes in the code.
-    Do a dry-run for the specified dataset, validating the column names & generated features. 
+    Do a dry-run for the specified dataset, validating the column names, generated features and file imports. 
+    Only load & understand the first 10 rows of the CSV -- you can extract the column names from this.
     You may use the CSV search tool for this. Fix the issues, but try not to make major changes.
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
@@ -218,7 +220,9 @@ code_evaluation_task:
     - code_generation_task
 
 code_execution_task:
-  description: Execute the file saved as output.py. Install any missing dependencies or configurations.
+  description: >
+    Execute the file saved as output.py. Don't use any tools. 
+    Install any missing dependencies or configurations.
   expected_output: A short paragraph detailing the model performance on test set & model complexity
   agent: machine_learning_operations_engineer
 
