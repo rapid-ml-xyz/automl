@@ -2,14 +2,16 @@ code_execution_task:
   description: Execute the file saved as "generated_model.py". Use the FileExecutorTool for executing.
   expected_output: Verbatim output of the code execution
   agent: chief_button_pusher
+  outputs:
+    - name: execution_result
+      description: Result of code execution
 
 code_evaluation_task:
   description: >
-    Evaluate the file saved as "generated_model.py" -- identify potential bugs & loopholes in the code.
-    Do a dry-run for the specified dataset, validating the column names, generated features and file imports. 
-    Load & understand ONLY the first 10 rows of the CSV if required -- you can extract the column names from this. 
-    Fix the issues, but try not to make major changes. Do not provide any summaries. I just want code. 
-    The entire file is python, so no need to markdown with ```python ... ```.
+    Evaluate the output of the code_execution_task in context of the file saved as "generated_model.py".
+    As an expert at machine learning & programming, solve the issue and write fresh code.
+    However, try to minimize major changes. You may use the tools at your disposal if required.  
+    The entire file is python, so no need to markdown with ```python ... ``` in the output.
   agent: machine_learning_operations_engineer
   expected_output: Working python code saved as generated_model.py
   output_file: generated_model.py
