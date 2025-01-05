@@ -1,17 +1,17 @@
 code_execution_task:
-  description: Execute the file saved as output.py in the root directory
+  description: Execute the file saved as "generated_model.py". Use the FileExecutorTool for executing.
   expected_output: Verbatim output of the code execution
   agent: chief_button_pusher
 
 code_evaluation_task:
   description: >
-    Evaluate the file saved as output.py -- identify potential bugs & loopholes in the code.
+    Evaluate the file saved as "generated_model.py" -- identify potential bugs & loopholes in the code.
     Do a dry-run for the specified dataset, validating the column names, generated features and file imports. 
     Load & understand ONLY the first 10 rows of the CSV if required -- you can extract the column names from this. 
     Fix the issues, but try not to make major changes. Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
-  expected_output: Working python code saved as output.py
-  output_file: output.py
+  expected_output: Working python code saved as generated_model.py
+  output_file: generated_model.py
   context:
     - code_execution_task

@@ -6,7 +6,6 @@ from crewai_tools import CSVSearchTool, DirectoryReadTool
 from .tools import (
 	ArxivSearchTool,
 	CsvPreviewTool,
-	FileExecutorTool,
 	FileOperationTool,
 	HuggingFaceSearchTool,
 	KaggleDownloadTool,
@@ -23,7 +22,7 @@ class ZeroShot:
 	"""KaggleAutoml crew"""
 
 	agents_config = 'config/agents.yaml'
-	tasks_config = 'config/tasks.yaml'
+	tasks_config = 'config/zero_shot_tasks.yaml'
 	load_dotenv()
 
 	openai_llm = LLM(
@@ -94,7 +93,7 @@ class ZeroShot:
 			allow_delegation=False,
 			config=self.agents_config['machine_learning_operations_engineer'],
 			llm=self.anthropic_llm,
-			tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool(), FileExecutorTool()],
+			tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool()],
 			verbose=True
 		)
 
@@ -119,7 +118,7 @@ class ZeroShot:
 	def request_verification_adequacy_task(self) -> Task:
 		return Task(config=self.tasks_config['request_verification_adequacy_task'])
 
-	# Might be redundant, since it's only pretty-printing the dataset_acquisition_task output.py
+	# Might be redundant, since it's only pretty-printing the dataset_acquisition_task output
 	@task
 	def request_parsing_task(self) -> Task:
 		return Task(config=self.tasks_config['request_parsing_task'])

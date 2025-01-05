@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import CSVSearchTool, DirectoryReadTool
-from .tools import CsvPreviewTool, FileExecutorTool
+from crewai_tools import CSVSearchTool
+from .tools import CsvPreviewTool, DirectoryReadTool, FileExecutorTool
 
 
 @CrewBase
@@ -11,7 +11,7 @@ class FewShot:
     """KaggleAutoml crew with iterative task loop"""
 
     agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
+    tasks_config = 'config/few_shot_tasks.yaml'
     load_dotenv()
 
     openai_llm = LLM(
@@ -27,54 +27,32 @@ class FewShot:
     )
 
     @agent
+    def chief_button_pusher(self) -> Agent:
+        return Agent(
+            allow_delegation=False,
+            config=self.agents_config['chief_button_pusher'],
+            llm=self.openai_llm,
+            tools=[DirectoryReadTool(), FileExecutorTool()],
+            verbose=True
+        )
+
+    @agent
     def machine_learning_operations_engineer(self) -> Agent:
         return Agent(
             allow_delegation=False,
             config=self.agents_config['machine_learning_operations_engineer'],
             llm=self.anthropic_llm,
-            tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool(), FileExecutorTool()],
+            tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool()],
             verbose=True
         )
 
     @task
-    def code_evaluation_task(self, iteration: int, previous_result: str = None) -> Task:
-        config = self.tasks_config['code_evaluation_task'].copy()
-
-        # Update task description to include iteration and previous results
-        config['description'] = f"""
-        Iteration {iteration}: Evaluate the code execution results and suggest improvements.
-        
-        Previous execution result:
-        {previous_result}
-        
-        If the code meets all requirements or no further improvements are needed,
-        include 'EXIT_CONDITION_MET' in your response.
-        
-        {config.get('description', '')}
-        """
-
-        return Task(
-            config=config,
-            agent=self.machine_learning_operations_engineer()
-        )
+    def code_execution_task(self) -> Task:
+        return Task(config=self.tasks_config['code_execution_task'])
 
     @task
-    def code_execution_task(self, iteration: int, code: str = None) -> Task:
-        config = self.tasks_config['code_execution_task'].copy()
-
-        # Update task description to include iteration and code to execute
-        config['description'] = f"""
-        Iteration {iteration}: Execute and analyze the following code:
-        
-        {code}
-        
-        {config.get('description', '')}
-        """
-
-        return Task(
-            config=config,
-            agent=self.machine_learning_operations_engineer()
-        )
+    def code_evaluation_task(self) -> Task:
+        return Task(config=self.tasks_config['code_evaluation_task'])
 
     @crew
     def crew(self) -> Crew:

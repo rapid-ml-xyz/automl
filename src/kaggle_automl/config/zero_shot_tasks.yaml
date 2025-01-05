@@ -200,7 +200,7 @@ code_generation_task:
     Do not provide any summaries. I just want code. 
     The entire file is python, so no need to markdown with ```python ... ```.
   agent: machine_learning_operations_engineer
-  output_file: output.py
+  output_file: generated_model.py
   context:
     - dataset_acquisition_task
     - pseudo_data_analysis_task
