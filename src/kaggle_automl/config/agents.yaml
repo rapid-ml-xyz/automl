@@ -88,6 +88,14 @@ machine_learning_operations_engineer:
     that can implement the optimal solution for production-level deployment, given any
     datasets and models. 
 
+chief_button_pusher:
+  role: Chief Button Pusher
+  goal: >
+    You have the following main responsibilities to complete.
+    1. Execute the python code reference provided to you 
+    2. Relay the output of the code execution
+  backstory: You are an expert at executing pre-written Python code.
+
 # Unused for MVP
 solution_supplier:
   role: >

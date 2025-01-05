@@ -1,0 +1,37 @@
+solution_submission_task:
+  description: >
+    Submit solution files to Kaggle competitions, ensuring proper file validation, 
+    accurate competition references, and clear submission messaging.
+  expected_output: Kaggle submission metrics & response
+  agent: solution_supplier
+  context:
+    - code_generation_task
+
+execution_verification_task:
+  description: >
+    Given the proposed solution and user’s requirements, please carefully check and verify
+    whether the proposed solution ’pass’ or ’fail’ the user’s requirements.
+    **Proposed Solution and Its Implementation**
+    Data Manipulation and Analysis: {data_agent_outcomes}
+    Modeling and Optimization: {model_agent_outcomes}
+    **User Requirements**
+    ‘‘‘json
+    {user_requirements}
+    ‘‘‘
+  expected_output: Answer only ’Pass’ or ’Fail’
+  agent: machine_learning_operations_engineer
+
+implementation_verification_task:
+  description: >
+    As the project manager, please carefully verify whether the given Python code and results
+    satisfy the user’s requirements.
+    - Python Code
+    ‘‘‘python
+    {implementation_result[’code’]}
+    ‘‘‘
+    - Code Execution Result
+    {implementation_result[’action_result’]}
+    - User’s Requirements
+    {user_requirements}
+  expected_output: Answer only ’Pass’ or ’Fail’
+  agent: senior_project_manager
