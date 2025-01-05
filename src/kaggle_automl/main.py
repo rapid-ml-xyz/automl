@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import warnings
 import argparse
-
-from .crew import KaggleAutoml
+from kaggle_automl.zero_shot_crew import ZeroShot
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -22,7 +21,7 @@ def run(topic):
     Run the crew.
     """
     inputs = {'topic': topic}
-    KaggleAutoml().crew().kickoff(inputs=inputs)
+    ZeroShot().crew().kickoff(inputs=inputs)
 
 
 def main():

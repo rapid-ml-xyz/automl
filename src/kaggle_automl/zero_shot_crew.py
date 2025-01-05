@@ -19,7 +19,7 @@ from .utils import load_template
 
 
 @CrewBase
-class KaggleAutoml:
+class ZeroShot:
 	"""KaggleAutoml crew"""
 
 	agents_config = 'config/agents.yaml'
@@ -119,7 +119,7 @@ class KaggleAutoml:
 	def request_verification_adequacy_task(self) -> Task:
 		return Task(config=self.tasks_config['request_verification_adequacy_task'])
 
-	# Might be redundant, since it's only pretty-printing the dataset_acquisition_task output
+	# Might be redundant, since it's only pretty-printing the dataset_acquisition_task output.py
 	@task
 	def request_parsing_task(self) -> Task:
 		return Task(config=self.tasks_config['request_parsing_task'])
@@ -153,14 +153,6 @@ class KaggleAutoml:
 			config=self.tasks_config['code_generation_task'],
 			expected_output=f"Generate a python script consistent with this template: \n {escaped_file_content}"
 		)
-
-	@task
-	def code_evaluation_task(self) -> Task:
-		return Task(config=self.tasks_config['code_evaluation_task'])
-
-	@task
-	def code_execution_task(self) -> Task:
-		return Task(config=self.tasks_config['code_execution_task'])
 
 	@crew
 	def crew(self) -> Crew:
