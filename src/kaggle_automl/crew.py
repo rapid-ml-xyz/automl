@@ -6,6 +6,7 @@ from crewai_tools import CSVSearchTool, DirectoryReadTool
 from .tools import (
 	ArxivSearchTool,
 	CsvPreviewTool,
+	FileExecutorTool,
 	FileOperationTool,
 	HuggingFaceSearchTool,
 	KaggleDownloadTool,
@@ -91,10 +92,9 @@ class KaggleAutoml:
 	def machine_learning_operations_engineer(self) -> Agent:
 		return Agent(
 			allow_delegation=False,
-			allow_code_execution=True,
 			config=self.agents_config['machine_learning_operations_engineer'],
 			llm=self.anthropic_llm,
-			tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool()],
+			tools=[CSVSearchTool(), CsvPreviewTool(), DirectoryReadTool(), FileExecutorTool()],
 			verbose=True
 		)
 
