@@ -10,7 +10,8 @@ from .kaggle_search_tool import KaggleSearchTool
 from .kaggle_submission_tool import KaggleSubmissionTool
 from .papers_with_code_search_tool import PapersWithCodeSearchTool
 from .pwd_tool import PWDTool
+from .ydata_profiling_tool import YDataProfilingTool
 
 __all__ = ["ArxivSearchTool", "CsvPreviewTool", "DirectoryReadTool", "FileExecutorTool", "FileOperationTool",
            "HuggingFaceSearchTool", "KaggleDownloadTool", "KaggleMetadataExtractorTool", "KaggleSearchTool",
-           "KaggleSubmissionTool", "PapersWithCodeSearchTool", "PWDTool"]
+           "KaggleSubmissionTool", "PapersWithCodeSearchTool", "PWDTool", "YDataProfilingTool"]
