@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import warnings
 import argparse
+from automl.eda_crew import EDACrew
 from automl.few_shot_crew import FewShot
 from automl.zero_shot_crew import ZeroShot
 
