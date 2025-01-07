@@ -1,5 +1,5 @@
 [project]
-name = "kaggle_automl"
+name = "automl"
 version = "0.1.0"
 description = "kaggle-automl using crewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
@@ -8,11 +8,12 @@ dependencies = [
     "arxiv>=2.1.3",
     "crewai[tools]>=0.86.0,<1.0.0",
     "huggingface-hub>=0.27.0",
-    "kaggle>=1.6.17"
+    "kaggle>=1.6.17",
+    "python-dotenv>=1.0.0"
 ]
 
 [project.scripts]
-rapidml = "kaggle_automl.main:main"
+rapidml = "automl.main:main"
 
 [build-system]
 requires = ["hatchling"]

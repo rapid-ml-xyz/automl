@@ -145,7 +145,7 @@ class ZeroShot:
 
 	@task
 	def code_generation_task(self) -> Task:
-		template_path = "src/kaggle_automl/templates/skeleton_python_script.txt"
+		template_path = "src/automl/templates/skeleton_python_script.txt"
 		file_content = load_template(template_path)
 		escaped_file_content = file_content.replace("{", "{{").replace("}", "}}")
 		return Task(

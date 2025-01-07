@@ -1,6 +1,6 @@
 # AutoML Crew
 
-### Create the following .env file:
+### .env
 
 ```
 OPENAI_MODEL=""
@@ -10,3 +10,8 @@ ANTHROPIC_API_KEY=""
 KAGGLE_API_KEY=""
 ```
 
+### run
+
+```commandline
+rapidml run --action {dataset_url} --max-iterations {n} 
+```

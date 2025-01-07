@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import warnings
 import argparse
-from kaggle_automl.few_shot_crew import FewShot
-from kaggle_automl.zero_shot_crew import ZeroShot
+from automl.few_shot_crew import FewShot
+from automl.zero_shot_crew import ZeroShot
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
