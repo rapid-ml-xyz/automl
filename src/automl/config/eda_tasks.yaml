@@ -13,7 +13,7 @@ ydata_download_task:
   description: >
     Analyze the provided dataset for the extracted columns using the YDataProfilingTool.
     Download and properly save the output JSON. Confirm the download location.
-  expected_output: Download confirmation and absolute path of file location. You may use the PWDTool for this.
+  expected_output: Absolute path of file location. No words before of after that.
   agent: dataset_acquisition_specialist
 
 json_loader_task:

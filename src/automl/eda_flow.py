@@ -29,24 +29,3 @@ class EDAFlow(Flow):
             verbose=True
         )
         return crew.kickoff()
-
-    @listen(ydata_download_flow)
-    def select_columns(self):
-        crew = Crew(
-            agents=[self.eda_crew.human_feedback_specialist()],
-            tasks=[self.eda_crew.column_selection_task()],
-            process=Process.sequential,
-            verbose=True
-        )
-        return crew.kickoff()
-
-    @listen(select_columns)
-    def analyze_data(self):
-        crew = Crew(
-            agents=[self.eda_crew.exploratory_data_analyst()],
-            tasks=[self.eda_crew.exploratory_data_analysis_task()],
-            process=Process.sequential,
-            verbose=True
-        )
-        crew.kickoff()
-        return self.select_columns()

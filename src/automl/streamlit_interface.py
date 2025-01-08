@@ -1,5 +1,6 @@
 import streamlit as st
-from typing import Dict, Any
+import json
+from typing import Dict, Any, Tuple
 from .eda_flow import EDAFlow
 
 
@@ -12,19 +13,29 @@ def setup_page():
     )
 
 
-def run_data_acquisition(action: str) -> Dict[str, Any]:
+def run_data_acquisition(action: str) -> Tuple[str, Dict[str, Any]]:
     """Run the initial data acquisition and processing
 
     Args:
         action (str): The analysis action/topic
 
     Returns:
-        Dict[str, Any]: Flow state containing dataset information
+        Tuple[str, Dict[str, Any]]: Tuple containing (json_path, loaded_json_data)
     """
     inputs = {'topic': action}
     eda_flow = EDAFlow()
+
     with st.spinner("Running data acquisition..."):
-        return eda_flow.kickoff(inputs=inputs)
+        json_path = eda_flow.kickoff(inputs=inputs).raw
+
+        # Load JSON data from the returned path
+        try:
+            with open(json_path, 'r') as f:
+                json_data = json.load(f)
+            return json_path, json_data
+        except Exception as e:
+            st.error(f"Error loading JSON from {json_path}: {str(e)}")
+            return json_path, {}
 
 
 class StreamlitInterface:
@@ -41,20 +52,22 @@ class StreamlitInterface:
         """
         st.title(f"AutoML Explorer - {action}")
 
-        # Configure sidebar
         st.sidebar.title("Controls")
         if st.sidebar.button("Reset"):
             st.session_state.clear()
 
-        # Run initial flow if needed
         if 'initial_state' not in st.session_state:
-            st.session_state.initial_state = run_data_acquisition(action)
+            json_path, json_data = run_data_acquisition(action)
+            st.session_state.initial_state = {
+                'path': json_path,
+                'data': json_data
+            }
 
         try:
-            # Load and display JSON data
             if 'initial_state' in st.session_state:
                 st.header("Acquired Data")
-                st.json(st.session_state.initial_state)
+                st.text(f"JSON Path: {st.session_state.initial_state['path']}")
+                st.json(st.session_state.initial_state['data'])
 
         except Exception as e:
             st.error(f"Error during exploration: {str(e)}")
