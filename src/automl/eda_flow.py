@@ -38,4 +38,5 @@ class EDAFlow(Flow):
             process=Process.sequential,
             verbose=True
         )
-        return crew.kickoff()
+        crew.kickoff()
+        return self.select_columns()
