@@ -10,6 +10,7 @@ from .tools import (
     KaggleDownloadTool,
     KaggleMetadataExtractorTool,
     PWDTool,
+    YDataDownloadTool,
     YDataProfilerTool,
 )
 
@@ -35,7 +36,7 @@ class EDACrew:
             config=self.agents_config['dataset_acquisition_specialist'],
             llm=self.openai_llm,
             tools=[DirectoryReadTool(), FileOperationTool(), KaggleDownloadTool(),
-                   KaggleMetadataExtractorTool(), PWDTool()],
+                   KaggleMetadataExtractorTool(), PWDTool(), YDataDownloadTool()],
             verbose=True
         )
 
@@ -62,6 +63,10 @@ class EDACrew:
     @task
     def dataset_acquisition_task(self) -> Task:
         return Task(config=self.tasks_config['dataset_acquisition_task'])
+
+    @task
+    def ydata_download_task(self) -> Task:
+        return Task(config=self.tasks_config['ydata_download_task'])
 
     @task
     def column_selection_task(self) -> Task:

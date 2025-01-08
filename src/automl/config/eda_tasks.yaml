@@ -9,6 +9,13 @@ dataset_acquisition_task:
     - Download confirmation and absolute path of file location. You may use the PWDTool for this.
   agent: dataset_acquisition_specialist
 
+ydata_download_task:
+  description: >
+    Analyze the provided dataset for the extracted columns using the YDataProfilingTool.
+    Download and properly save the output JSON. Confirm the download location.
+  expected_output: Download confirmation and absolute path of file location. You may use the PWDTool for this.
+  agent: dataset_acquisition_specialist
+
 column_selection_task:
   description: >
     Use the CsvPreview tool to read the first 5 rows, and extract all the column names.

@@ -21,6 +21,16 @@ class EDAFlow(Flow):
         return crew.kickoff(inputs=self.state)
 
     @listen(dataset_acquisition_flow)
+    def ydata_download_flow(self):
+        crew = Crew(
+            agents=[self.eda_crew.dataset_acquisition_specialist()],
+            tasks=[self.eda_crew.ydata_download_task()],
+            process=Process.sequential,
+            verbose=True
+        )
+        return crew.kickoff()
+
+    @listen(ydata_download_flow)
     def select_columns(self):
         crew = Crew(
             agents=[self.eda_crew.human_feedback_specialist()],
