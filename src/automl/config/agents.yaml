@@ -100,6 +100,15 @@ chief_button_pusher:
 
 ############################ EDA Agents ##################################
 
+data_loader_agent:
+  role: Data Loader Agent
+  goal: > 
+    Efficiently and accurately read JSON files from the local filesystem 
+    while handling potential errors and validating the data structure.
+  backstory: >
+    You specialize in reading and parsing local JSON data files, 
+    with built-in error handling and validation capabilities
+
 human_feedback_specialist:
   role: Human Feedback Specialist
   goal: Gather and process human feedback

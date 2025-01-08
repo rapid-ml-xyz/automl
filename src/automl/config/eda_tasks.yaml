@@ -16,6 +16,12 @@ ydata_download_task:
   expected_output: Download confirmation and absolute path of file location. You may use the PWDTool for this.
   agent: dataset_acquisition_specialist
 
+json_loader_task:
+  description: Read and parse a local JSON file, validating its structure and returning the parsed content
+  expected_output: > 
+    A parsed JSON object containing the file's contents, with error messages if file access or parsing fails.
+  agent: data_loader_agent
+
 column_selection_task:
   description: >
     Use the CsvPreview tool to read the first 5 rows, and extract all the column names.

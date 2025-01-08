@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import warnings
 import argparse
-from automl.eda_crew import EDACrew
-from automl.eda_flow import EDAFlow
-from automl.few_shot_crew import FewShot
-from automl.zero_shot_crew import ZeroShot
+from .streamlit_interface import StreamlitInterface
+from .few_shot_crew import FewShot
+from .zero_shot_crew import ZeroShot
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -14,9 +13,9 @@ def parse_args():
     Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description='KaggleAutoML CLI')
-    parser.add_argument('command', choices=['run'], help='Command to execute')
+    parser.add_argument('command', choices=['explore', 'run'], help='Command to execute')
     parser.add_argument('--action', type=str, required=True, help='Action to be performed')
-    parser.add_argument('--max-iterations', type=int, default=5, required=True, help='Maximum number of iterations')
+    parser.add_argument('--max-iterations', type=int, default=5, required=False, help='Maximum number of iterations')
     return parser.parse_args()
 
 
@@ -35,8 +34,11 @@ def run(action, max_iterations=5):
         few_shot_crew.kickoff()
         iteration_count += 1
 
-    if iteration_count == max_iterations:
-        print("Maximum iterations reached. Exiting.")
+
+def explore(action):
+    """Run the exploration interface."""
+    interface = StreamlitInterface()
+    interface.explore(action)
 
 
 def main():
@@ -44,6 +46,8 @@ def main():
 
     if args.command == 'run':
         run(args.action, args.max_iterations)
+    elif args.command == 'explore':
+        explore(args.action)
     else:
         raise Exception("Invalid command")
 
