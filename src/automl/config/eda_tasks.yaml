@@ -4,26 +4,22 @@ dataset_acquisition_task:
     1. Download and properly save the dataset
     2. Scan the downloaded folder for CSV files using the DirectoryReadTool and rename all files to snake case 
     3. Confirm the download location and success
-    4. Extract key information from the dataset documentation
-    5. Identify evaluation metrics, target variable(s), and potential use cases
   expected_output: >
     A complete dataset acquisition report including:
     - Download confirmation and absolute path of file location. You may use the PWDTool for this.
-    - Absolute dataset reference and key documentation points. You may use the PWDTool for this.
-    - Target variable
-    - Evaluation metrics
   agent: dataset_acquisition_specialist
 
 column_selection_task:
-  description: Use the HumanInTheLoopTool to get feedback on column selection
-  expected_output: A list of column names
+  description: >
+    Use the CsvPreview tool to read the first 5 rows, and extract all the column names.
+    After that, use the HumanInTheLoopTool to get feedback on column selection.
+  expected_output: A list of selected column names
   agent: human_feedback_specialist
   context:
     - dataset_acquisition_task
 
 exploratory_data_analysis_task:
   description: >
-    Use the CsvPreview tool to read the first 5 rows, and extract the column names.  
     Analyze the provided dataset for the extracted columns using the YDataProfilingTool.
     Generate a comprehensive natural language report.
   expected_output: >

@@ -45,7 +45,7 @@ class EDACrew:
             allow_delegation=False,
             config=self.agents_config['human_feedback_specialist'],
             llm=self.openai_llm,
-            tools=[HumanInTheLoopTool()],
+            tools=[CsvPreviewTool(), DirectoryReadTool(), PWDTool(), HumanInTheLoopTool()],
             verbose=True
         )
 
@@ -55,7 +55,7 @@ class EDACrew:
             allow_delegation=False,
             config=self.agents_config['exploratory_data_analyst'],
             llm=self.openai_llm,
-            tools=[CsvPreviewTool(), DirectoryReadTool(), PWDTool(), YDataProfilerTool()],
+            tools=[DirectoryReadTool(), PWDTool(), YDataProfilerTool()],
             verbose=True
         )
 

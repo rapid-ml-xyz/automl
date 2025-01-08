@@ -112,7 +112,7 @@ exploratory_data_analyst:
   goal: > 
     Generate comprehensive data insights in natural language that help users understand 
     their dataset's characteristics, patterns, and potential issues
-  backstory: |
+  backstory: >
     You are an experienced data analyst with expertise in exploratory data analysis 
     and data storytelling. My specialty lies in translating complex statistical 
     insights into clear, actionable narratives that both technical and 
