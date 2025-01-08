@@ -6,6 +6,7 @@ from .tools import (
     CsvPreviewTool,
     DirectoryReadTool,
     FileOperationTool,
+    HumanInTheLoopTool,
     KaggleDownloadTool,
     KaggleMetadataExtractorTool,
     PWDTool,
@@ -39,6 +40,16 @@ class EDACrew:
         )
 
     @agent
+    def human_feedback_specialist(self) -> Agent:
+        return Agent(
+            allow_delegation=False,
+            config=self.agents_config['human_feedback_specialist'],
+            llm=self.openai_llm,
+            tools=[HumanInTheLoopTool()],
+            verbose=True
+        )
+
+    @agent
     def exploratory_data_analyst(self) -> Agent:
         return Agent(
             allow_delegation=False,
@@ -51,6 +62,10 @@ class EDACrew:
     @task
     def dataset_acquisition_task(self) -> Task:
         return Task(config=self.tasks_config['dataset_acquisition_task'])
+
+    @task
+    def column_selection_task(self) -> Task:
+        return Task(config=self.tasks_config['column_selection_task'])
 
     @task
     def exploratory_data_analysis_task(self) -> Task:

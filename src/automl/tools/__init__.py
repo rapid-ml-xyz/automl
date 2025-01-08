@@ -3,6 +3,7 @@ from .csv_preview_tool import CsvPreviewTool
 from .directory_read_tool import DirectoryReadTool
 from .file_executor_tool import FileExecutorTool
 from .file_operation_tool import FileOperationTool
+from .hitl_tool import HumanInTheLoopTool
 from .hugging_face_search_tool import HuggingFaceSearchTool
 from .kaggle_download_tool import KaggleDownloadTool
 from .kaggle_metadata_extractor_tool import KaggleMetadataExtractorTool
@@ -13,5 +14,5 @@ from .pwd_tool import PWDTool
 from .ydata_profiler_tool import YDataProfilerTool
 
 __all__ = ["ArxivSearchTool", "CsvPreviewTool", "DirectoryReadTool", "FileExecutorTool", "FileOperationTool",
-           "HuggingFaceSearchTool", "KaggleDownloadTool", "KaggleMetadataExtractorTool", "KaggleSearchTool",
-           "KaggleSubmissionTool", "PapersWithCodeSearchTool", "PWDTool", "YDataProfilerTool"]
+           "HumanInTheLoopTool", "HuggingFaceSearchTool", "KaggleDownloadTool", "KaggleMetadataExtractorTool",
+           "KaggleSearchTool", "KaggleSubmissionTool", "PapersWithCodeSearchTool", "PWDTool", "YDataProfilerTool"]

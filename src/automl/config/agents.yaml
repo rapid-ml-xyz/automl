@@ -100,6 +100,13 @@ chief_button_pusher:
 
 ############################ EDA Agents ##################################
 
+human_feedback_specialist:
+  role: Human Feedback Specialist
+  goal: Gather and process human feedback
+  backstory: >
+      You are responsible for facilitating a human-in-the-loop workflow.
+      You present information clearly and collect structured feedback to guide next steps.
+
 exploratory_data_analyst:
   role: Data Insights Specialist
   goal: > 
