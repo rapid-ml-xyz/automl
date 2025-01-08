@@ -1,35 +1,26 @@
 from crewai.tools import BaseTool
-from typing import Type, List, Optional
+from typing import Type
 from pydantic import BaseModel, Field
-import pandas as pd
-from ydata_profiling import ProfileReport
 import json
 
 
 class YDataProfilerInput(BaseModel):
     """Input schema for DataProfilerTool."""
-    filepath: str = Field(..., description="Path to the CSV file to analyze")
-    columns: Optional[List[str]] = Field(None, description="List of column names for the CSV file")
+    json_filepath: str = Field(..., description="Path to the YData profile JSON file to process")
 
 
 class YDataProfilerTool(BaseTool):
-    name: str = "YData Profile Report Tool"
+    name: str = "YData Profile Report Processor"
     description: str = (
-        "Analyzes a CSV dataset using YData Profiling (formerly pandas-profiling) "
-        "and returns key metrics and insights from the profile report. "
-        "Supports custom column names and produces condensed output suitable for LLMs."
+        "Processes a YData Profiling JSON report and returns key metrics and insights. "
+        "Produces condensed output suitable for LLMs."
     )
     args_schema: Type[BaseModel] = YDataProfilerInput
 
-    def _run(self, filepath: str, columns: Optional[List[str]] = None) -> str:
+    def _run(self, json_filepath: str) -> str:
         try:
-            if columns:
-                df = pd.read_csv(filepath, names=columns, na_values=' ?', skipinitialspace=True)
-            else:
-                df = pd.read_csv(filepath)
-
-            profile = ProfileReport(df, minimal=True)
-            full_report = json.loads(profile.to_json())
+            with open(json_filepath, 'r') as f:
+                full_report = json.load(f)
 
             summary = {
                 "dataset_info": {
@@ -110,4 +101,4 @@ class YDataProfilerTool(BaseTool):
             return json.dumps(summary, indent=2)
 
         except Exception as e:
-            return f"Error generating profile report: {str(e)}"
+            return f"Error processing profile report: {str(e)}"
