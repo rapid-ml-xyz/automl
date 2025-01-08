@@ -2,6 +2,7 @@
 import warnings
 import argparse
 from automl.eda_crew import EDACrew
+from automl.eda_flow import EDAFlow
 from automl.few_shot_crew import FewShot
 from automl.zero_shot_crew import ZeroShot
 
