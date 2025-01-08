@@ -1,5 +1,5 @@
 from crewai.tools import BaseTool
-from typing import Type
+from typing import Type, List, Optional
 from pydantic import BaseModel, Field
 import pandas as pd
 from ydata_profiling import ProfileReport
@@ -9,28 +9,28 @@ import json
 class YDataProfilerInput(BaseModel):
     """Input schema for DataProfilerTool."""
     filepath: str = Field(..., description="Path to the CSV file to analyze")
+    columns: Optional[List[str]] = Field(None, description="List of column names for the CSV file")
 
 
 class YDataProfilerTool(BaseTool):
     name: str = "YData Profile Report Tool"
     description: str = (
         "Analyzes a CSV dataset using YData Profiling (formerly pandas-profiling) "
-        "and returns key metrics and insights from the profile report."
+        "and returns key metrics and insights from the profile report. "
+        "Supports custom column names and produces condensed output suitable for LLMs."
     )
     args_schema: Type[BaseModel] = YDataProfilerInput
 
-    def _run(self, filepath: str) -> str:
+    def _run(self, filepath: str, columns: Optional[List[str]] = None) -> str:
         try:
-            # Read the CSV file
-            df = pd.read_csv(filepath)
+            if columns:
+                df = pd.read_csv(filepath, names=columns, na_values=' ?', skipinitialspace=True)
+            else:
+                df = pd.read_csv(filepath)
 
-            # Generate the profile report
             profile = ProfileReport(df, minimal=True)
-
-            # Get the full report as JSON
             full_report = json.loads(profile.to_json())
 
-            # Extract only the most important metrics
             summary = {
                 "dataset_info": {
                     "number_of_variables": full_report.get("table", {}).get("n_var", 0),
@@ -41,62 +41,71 @@ class YDataProfilerTool(BaseTool):
                 "variables": {}
             }
 
-            # Extract key metrics for each variable
+            def format_number(num):
+                if isinstance(num, (int, float)):
+                    return round(num, 4) if isinstance(num, float) else num
+                return num
+
+            max_variables = 20
+            processed_vars = 0
+
             for var_name, var_data in full_report.get("variables", {}).items():
+                if processed_vars >= max_variables:
+                    break
+
                 var_summary = {
                     "type": var_data.get("type", "unknown"),
                     "distinct_count": var_data.get("n_distinct", 0),
                     "missing_count": var_data.get("n_missing", 0),
-                    "missing_percentage": var_data.get("p_missing", 0)
+                    "missing_percentage": format_number(var_data.get("p_missing", 0))
                 }
 
-                # Add type-specific statistics
                 if var_data.get("type") in ["numeric", "integer", "float"]:
                     stats = {
-                        "mean": var_data.get("mean", None),
-                        "std": var_data.get("std", None),
-                        "min": var_data.get("min", None),
-                        "max": var_data.get("max", None)
+                        "mean": format_number(var_data.get("mean", None)),
+                        "std": format_number(var_data.get("std", None)),
+                        "min": format_number(var_data.get("min", None)),
+                        "max": format_number(var_data.get("max", None))
                     }
-                    # Only add non-None values
                     stats = {k: v for k, v in stats.items() if v is not None}
                     if stats:
                         var_summary.update(stats)
 
                 elif var_data.get("type") == "categorical":
-                    # Include top categories if available
                     value_counts = var_data.get("value_counts_without_nan", {})
                     if value_counts:
-                        top_categories = dict(list(value_counts.items())[:5])
+                        top_categories = dict(list(value_counts.items())[:3])
                         if top_categories:
-                            var_summary["top_categories"] = top_categories
+                            var_summary["top_categories"] = {
+                                k: format_number(v) for k, v in top_categories.items()
+                            }
 
                 summary["variables"][var_name] = var_summary
+                processed_vars += 1
 
-            # Include correlations if available
             correlations = full_report.get("correlations", {})
             if correlations:
-                # Get the first correlation method available
                 correlation_method = next(iter(correlations), None)
                 if correlation_method:
                     corr_data = correlations[correlation_method]
                     correlation_pairs = []
 
-                    # Extract correlations while handling potential missing or None values
                     for var1 in corr_data:
                         for var2 in corr_data.get(var1, {}):
-                            if var1 < var2:  # Avoid duplicates
+                            if var1 < var2:
                                 value = corr_data[var1].get(var2)
                                 if value is not None:
                                     correlation_pairs.append({
                                         "variables": [var1, var2],
-                                        "correlation": value
+                                        "correlation": format_number(value)
                                     })
 
-                    # Sort by absolute correlation value and take top 10
                     if correlation_pairs:
                         correlation_pairs.sort(key=lambda x: abs(x["correlation"]), reverse=True)
                         summary["correlations"] = correlation_pairs[:10]
+
+            if processed_vars >= max_variables:
+                summary["note"] = f"Output limited to {max_variables} variables for context size"
 
             return json.dumps(summary, indent=2)
 

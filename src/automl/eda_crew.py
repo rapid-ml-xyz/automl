@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from .tools import (
+    CsvPreviewTool,
     DirectoryReadTool,
     FileOperationTool,
     KaggleDownloadTool,
@@ -43,7 +44,7 @@ class EDACrew:
             allow_delegation=False,
             config=self.agents_config['exploratory_data_analyst'],
             llm=self.openai_llm,
-            tools=[DirectoryReadTool(), PWDTool(), YDataProfilerTool()],
+            tools=[CsvPreviewTool(), DirectoryReadTool(), PWDTool(), YDataProfilerTool()],
             verbose=True
         )
 

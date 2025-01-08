@@ -16,27 +16,9 @@ dataset_acquisition_task:
 
 exploratory_data_analysis_task:
   description: >
-    Analyze the provided dataset using the YDataProfilingTool and generate a 
-    comprehensive natural language report that covers:
-    1. Dataset Overview
-       - Total number of records and features
-       - Data types distribution
-       - Memory usage
-    2. Data Quality Assessment
-       - Missing values analysis
-       - Duplicate records
-       - Potential data inconsistencies
-    3. Statistical Insights
-       - Key statistics for numerical columns
-       - Distribution patterns
-       - Outlier detection
-    4. Relationships and Patterns
-       - Correlation analysis
-       - Interesting relationships between variables
-    5. Actionable Recommendations
-       - Data quality improvements
-       - Potential areas for deeper analysis
-       - Data collection suggestions
+    Use the CsvPreview tool to read the first 5 rows, and extract the column names.  
+    Analyze the provided dataset for the extracted columns using the YDataProfilingTool.
+    Generate a comprehensive natural language report.
   expected_output: >
     A detailed natural language report that:
     - Presents insights in clear, conversational language
