@@ -1,8 +1,5 @@
 import streamlit as st
-from streamlit_chat import message
-import json
-from typing import Dict, Any, Tuple
-from .eda_flow import EDAFlow
+from .eda_flow import DownloadFlow
 
 
 def setup_page():
@@ -14,135 +11,112 @@ def setup_page():
     )
 
 
-def init_chat_state():
-    """Initialize chat-related session state variables"""
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
-    if 'generated' not in st.session_state:
-        st.session_state.generated = []
-    if 'past' not in st.session_state:
-        st.session_state.past = []
-    if 'input_key' not in st.session_state:
-        st.session_state.input_key = 0
+def init_state():
+    """Initialize session state variables"""
+    if 'reports' not in st.session_state:
+        st.session_state.reports = []
+    if 'visualizations' not in st.session_state:
+        st.session_state.visualizations = []
+    if 'data_initialized' not in st.session_state:
+        st.session_state.data_initialized = False
+    if 'json_path' not in st.session_state:
+        st.session_state.json_path = None
 
 
-def run_data_acquisition(action: str) -> Tuple[str, Dict[str, Any]]:
-    """Run the initial data acquisition and processing
-
-    Args:
-        action (str): The analysis action/topic
-
-    Returns:
-        Tuple[str, Dict[str, Any]]: Tuple containing (json_path, loaded_json_data)
-    """
+def run_download_flow(action: str) -> str:
+    """Run the data download flow"""
     inputs = {'topic': action}
-    eda_flow = EDAFlow()
+    eda_flow = DownloadFlow()
 
     with st.spinner("Running data acquisition..."):
         json_path = eda_flow.kickoff(inputs=inputs).raw
+        print(json_path)
 
-        try:
-            with open(json_path, 'r') as f:
-                json_data = json.load(f)
-            return json_path, json_data
-        except Exception as e:
-            st.error(f"Error loading JSON from {json_path}: {str(e)}")
-            return json_path, {}
+    return json_path
+
 
 class StreamlitInterface:
     """Streamlit interface for KaggleAutoML exploration"""
 
     def __init__(self):
         setup_page()
-        init_chat_state()
+        init_state()
 
-    def display_chat_interface(self, container):
-        """Display the chat interface using streamlit_chat"""
-        container.header("Chat Interface")
+    def display_text_reports(self, container):
+        """Display text reports in the left column"""
+        container.header("Analysis Reports")
 
-        # Container for chat messages
-        chat_container = container.container()
+        # Display reports in reverse chronological order
+        for i, report in enumerate(reversed(st.session_state.reports)):
+            report_num = len(st.session_state.reports) - i
+            with container.expander(f"Report {report_num}", expanded=True):
+                st.markdown(report)
 
-        # Display chat messages in a scrollable container
-        with chat_container:
-            # Add CSS to control chat container height
-            st.markdown("""
-                <style>
-                    .stChatMessageContent {
-                        max-width: 100%;
-                    }
-                    .stTextInput {
-                        position: sticky;
-                        bottom: 0;
-                        background-color: white;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-
-            # Display messages
-            for i in range(len(st.session_state.generated)):
-                message(st.session_state.past[i], is_user=True, key=f"user_{i}")
-                message(st.session_state.generated[i], key=f"bot_{i}")
-
-        # Chat input with dynamic key
-        input_key = f"user_input_{st.session_state.input_key}"
-        user_input = container.text_input("Ask about the data:", key=input_key, placeholder="Type your question here...")
-
-        if user_input:
-            # Add user message to history
-            st.session_state.past.append(user_input)
-
-            # Generate bot response (placeholder - customize as needed)
-            bot_response = f"I understand your question about: {user_input}"
-            st.session_state.generated.append(bot_response)
-
-            # Increment key for next input
-            st.session_state.input_key += 1
-
-            # Rerun to update the chat display
-            st.rerun()
-
-    def display_visualization_area(self, container):
-        """Display the visualization area (placeholder for future implementations)"""
+    def display_visualizations(self, container):
+        """Display visualizations in the right column"""
         container.header("Visualizations")
 
-        # Placeholder for future visualizations
-        container.markdown("""
-            ### Visualization Area
-            This area will contain:
-            - Data visualizations
-            - Interactive charts
-            - Analysis results
-        """)
+        # Display visualizations in reverse chronological order
+        for i, viz in enumerate(reversed(st.session_state.visualizations)):
+            viz_num = len(st.session_state.visualizations) - i
+            with container.expander(f"Visualization {viz_num}", expanded=True):
+                st.plotly_chart(viz, use_container_width=True)
 
-        # Example placeholder for a visualization
-        with container.container():
-            st.markdown("Visualization placeholder")
+    def process_query(self, query: str):
+        """Process the user's query and generate reports/visualizations"""
+        if not query:
+            return
+
+        # TODO: Replace with actual analysis logic
+        # Example: Add a sample report
+        report = f"Analysis results for query: {query}\n\n" + \
+                 "This is a placeholder for the actual analysis report."
+        st.session_state.reports.append(report)
+
+        # Example: Add a sample visualization
+        # You would replace this with actual visualization generation
+        import plotly.express as px
+        fig = px.line(x=[1, 2, 3], y=[1, 2, 3], title=f"Analysis for: {query}")
+        st.session_state.visualizations.append(fig)
 
     def explore(self, action: str):
-        """Main exploration interface
-
-        Args:
-            action (str): The analysis action/topic
-        """
+        """Main exploration interface"""
         st.title(f"Exploratory Data Analysis - {action}")
 
         # Sidebar controls
         st.sidebar.title("Controls")
-        if st.sidebar.button("Reset"):
-            st.session_state.clear()
+        if st.sidebar.button("Reset Analysis"):
+            st.session_state.reports = []
+            st.session_state.visualizations = []
+            st.session_state.data_initialized = False
+            st.session_state.json_path = None
 
         try:
-            # Create two columns for the layout
-            chat_col, viz_col = st.columns(2)
+            # Only run data acquisition once
+            if not st.session_state.data_initialized:
+                st.session_state.json_path = run_download_flow(action)
+                st.session_state.data_initialized = True
 
-            # Display chat interface in left column
-            with chat_col:
-                self.display_chat_interface(chat_col)
+            # Single input box at the top
+            query = st.text_input(
+                "Ask about the data:",
+                placeholder="Type your question here...",
+                help="Enter your analysis question"
+            )
 
-            # Display visualization area in right column
-            with viz_col:
-                self.display_visualization_area(viz_col)
+            # Process the query when entered
+            if query:
+                self.process_query(query)
+
+            # Split screen layout
+            left_col, right_col = st.columns(2)
+
+            # Display reports and visualizations in their respective columns
+            with left_col:
+                self.display_text_reports(left_col)
+
+            with right_col:
+                self.display_visualizations(right_col)
 
         except Exception as e:
             st.error(f"Error during exploration: {str(e)}")

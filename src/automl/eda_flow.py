@@ -3,8 +3,8 @@ from crewai.flow.flow import Flow, listen, start
 from .eda_crew import EDACrew
 
 
-class EDAFlow(Flow):
-    """Flow for orchestrating the EDA process using existing EDACrew components"""
+class DownloadFlow(Flow):
+    """Flow for downloading the dataset and y-data analysis"""
 
     def __init__(self):
         self.eda_crew = EDACrew()
@@ -29,3 +29,21 @@ class EDAFlow(Flow):
             verbose=True
         )
         return crew.kickoff()
+
+
+class ExplorationFlow(Flow):
+    """Flow for EDA on the saved dataset"""
+
+    def __init__(self):
+        self.eda_crew = EDACrew()
+        super().__init__()
+
+    @start()
+    def exploratory_data_analysis_flow(self):
+        crew = Crew(
+            agents=[self.eda_crew.exploratory_data_analyst()],
+            tasks=[self.eda_crew.exploratory_data_analysis_task()],
+            process=Process.sequential,
+            verbose=True
+        )
+        return crew.kickoff(inputs=self.state)
