@@ -1,5 +1,7 @@
 import streamlit as st
+import plotly.graph_objects as go
 from .eda_flow import DownloadFlow, ExplorationFlow, VisualizationFlow
+import json
 
 
 def setup_page():
@@ -55,8 +57,22 @@ def run_visualization_flow(user_input):
     }
     visualization_flow = VisualizationFlow()
 
-    with st.spinner("Running data exploration..."):
-        visualization_flow.kickoff(inputs=inputs)
+    with st.spinner("Running visualization creation..."):
+        try:
+            raw_fig_json = visualization_flow.kickoff(inputs=inputs).raw
+            if isinstance(raw_fig_json, str):
+                fig_dict = json.loads(raw_fig_json)
+            else:
+                fig_dict = raw_fig_json
+
+            fig = go.Figure(fig_dict)
+            return [fig]
+        except json.JSONDecodeError as e:
+            st.error(f"Error parsing visualization JSON: {str(e)}")
+            return []
+        except Exception as e:
+            st.error(f"Error creating visualization: {str(e)}")
+            return []
 
 
 class StreamlitInterface:
@@ -78,7 +94,10 @@ class StreamlitInterface:
         for i, viz in enumerate(reversed(st.session_state.visualizations)):
             viz_num = len(st.session_state.visualizations) - i
             with container.expander(f"Visualization {viz_num}", expanded=True):
-                st.plotly_chart(viz, use_container_width=True)
+                try:
+                    st.plotly_chart(viz, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error displaying visualization {viz_num}: {str(e)}")
 
     def process_query(self, query: str):
         if not query:
@@ -87,9 +106,9 @@ class StreamlitInterface:
         report = run_reporting_flow(query)
         st.session_state.reports.append(report)
 
-        run_visualization_flow(query)
-        # if visualizations:
-        #     st.session_state.visualizations.extend(visualizations)
+        visualizations = run_visualization_flow(query)
+        if visualizations:
+            st.session_state.visualizations.extend(visualizations)
 
     def explore(self, action: str):
         """Main exploration interface"""

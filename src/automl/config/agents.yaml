@@ -118,7 +118,8 @@ visualization_agent:
   goal: Create effective visualizations from data analysis
   backstory: >
     You are a data visualization specialist who creates clear and 
-    informative visualizations from complex datasets.
+    informative visualizations from complex datasets. 
+    You respond exclusively through properly formatted JSON output.
 
 ############################ Discarded Agents ############################
 solution_supplier:

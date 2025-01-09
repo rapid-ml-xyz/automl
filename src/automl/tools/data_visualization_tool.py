@@ -1,5 +1,5 @@
 from crewai.tools import BaseTool
-from typing import Type, List
+from typing import Type, List, Dict, Any
 from pydantic import BaseModel, Field
 import plotly.graph_objects as go
 import numpy as np
@@ -41,9 +41,8 @@ class DataVisualizationTool(BaseTool):
         variable_names: List[str],
         chart_type: str,
         title: str = None
-    ) -> go.Figure:
-        """Creates the requested visualization"""
-        # Load the JSON data
+    ) -> Dict[str, Any]:
+        """Creates the requested visualization and returns it as JSON"""
         with open(json_filepath, 'r') as f:
             data = json.load(f)
 
@@ -51,11 +50,13 @@ class DataVisualizationTool(BaseTool):
             if len(variable_names) != 1:
                 raise ValueError("Distribution charts require exactly one variable")
             var_info = data['variables'][variable_names[0]]
-            return self._create_distribution_chart(var_info, variable_names[0], title)
+            fig = self._create_distribution_chart(var_info, variable_names[0], title)
         elif chart_type == 'correlation':
-            return self._create_correlation_matrix(data, variable_names, title)
+            fig = self._create_correlation_matrix(data, variable_names, title)
         else:
             raise ValueError(f"Unsupported chart type: {chart_type}")
+
+        return json.loads(fig.to_json())
 
     def _create_distribution_chart(self, var_info: dict, var_name: str, title: str = None) -> go.Figure:
         """Creates appropriate distribution chart based on variable type"""

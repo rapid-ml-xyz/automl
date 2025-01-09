@@ -36,9 +36,8 @@ visualization_task:
     {json_filepath} Analyze the provided JSON and create visualizations.
     User input: {user_input}
     ONLY focus on the attributes the user wants visualizations about.
+    ALWAYS return ONLY the raw Plotly figure JSON.
+    Do not include any other text, wrapper objects, or explanations - ONLY the figure JSON.
   expected_output: >
-    Create the following visualizations:
-    1. Distribution plots for numeric variables
-    2. Bar charts for categorical variables
-    3. Correlation matrix for numeric variables
+    A complete Plotly figure dictionary that can be directly converted to a Plotly figure object using go.Figure()
   agent: visualization_agent
