@@ -49,7 +49,6 @@ def run_data_acquisition(action: str) -> Tuple[str, Dict[str, Any]]:
             st.error(f"Error loading JSON from {json_path}: {str(e)}")
             return json_path, {}
 
-
 class StreamlitInterface:
     """Streamlit interface for KaggleAutoML exploration"""
 
@@ -57,22 +56,37 @@ class StreamlitInterface:
         setup_page()
         init_chat_state()
 
-    def display_chat_interface(self):
+    def display_chat_interface(self, container):
         """Display the chat interface using streamlit_chat"""
-        st.header("Chat Interface")
+        container.header("Chat Interface")
 
         # Container for chat messages
-        chat_container = st.container()
+        chat_container = container.container()
 
-        # Display chat messages
+        # Display chat messages in a scrollable container
         with chat_container:
+            # Add CSS to control chat container height
+            st.markdown("""
+                <style>
+                    .stChatMessageContent {
+                        max-width: 100%;
+                    }
+                    .stTextInput {
+                        position: sticky;
+                        bottom: 0;
+                        background-color: white;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+
+            # Display messages
             for i in range(len(st.session_state.generated)):
                 message(st.session_state.past[i], is_user=True, key=f"user_{i}")
                 message(st.session_state.generated[i], key=f"bot_{i}")
 
         # Chat input with dynamic key
         input_key = f"user_input_{st.session_state.input_key}"
-        user_input = st.text_input("Ask about the data:", key=input_key, placeholder="Type your question here...")
+        user_input = container.text_input("Ask about the data:", key=input_key, placeholder="Type your question here...")
 
         if user_input:
             # Add user message to history
@@ -88,26 +102,47 @@ class StreamlitInterface:
             # Rerun to update the chat display
             st.rerun()
 
+    def display_visualization_area(self, container):
+        """Display the visualization area (placeholder for future implementations)"""
+        container.header("Visualizations")
+
+        # Placeholder for future visualizations
+        container.markdown("""
+            ### Visualization Area
+            This area will contain:
+            - Data visualizations
+            - Interactive charts
+            - Analysis results
+        """)
+
+        # Example placeholder for a visualization
+        with container.container():
+            st.markdown("Visualization placeholder")
+
     def explore(self, action: str):
         """Main exploration interface
 
         Args:
             action (str): The analysis action/topic
         """
-        st.title(f"AutoML Explorer - {action}")
+        st.title(f"Exploratory Data Analysis - {action}")
 
+        # Sidebar controls
         st.sidebar.title("Controls")
         if st.sidebar.button("Reset"):
             st.session_state.clear()
 
         try:
-            if 'initial_state' in st.session_state:
-                st.header("Acquired Data")
-                st.text(f"JSON Path: {st.session_state.initial_state['path']}")
-                st.json(st.session_state.initial_state['data'])
+            # Create two columns for the layout
+            chat_col, viz_col = st.columns(2)
 
-            # Add chat interface below the data display
-            self.display_chat_interface()
+            # Display chat interface in left column
+            with chat_col:
+                self.display_chat_interface(chat_col)
+
+            # Display visualization area in right column
+            with viz_col:
+                self.display_visualization_area(viz_col)
 
         except Exception as e:
             st.error(f"Error during exploration: {str(e)}")
