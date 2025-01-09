@@ -4,15 +4,12 @@ from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import FileReadTool
 from .tools import (
-    CsvPreviewTool,
     DirectoryReadTool,
     FileOperationTool,
-    HumanInTheLoopTool,
     KaggleDownloadTool,
     KaggleMetadataExtractorTool,
     PWDTool,
     YDataDownloadTool,
-    YDataProfilerTool,
 )
 
 
@@ -42,32 +39,12 @@ class EDACrew:
         )
 
     @agent
-    def data_loader_agent(self) -> Agent:
-        return Agent(
-            allow_delegation=False,
-            config=self.agents_config['data_loader_agent'],
-            llm=self.openai_llm,
-            tools=[DirectoryReadTool(), FileReadTool(), PWDTool()],
-            verbose=True
-        )
-
-    @agent
-    def human_feedback_specialist(self) -> Agent:
-        return Agent(
-            allow_delegation=False,
-            config=self.agents_config['human_feedback_specialist'],
-            llm=self.openai_llm,
-            tools=[CsvPreviewTool(), DirectoryReadTool(), PWDTool(), HumanInTheLoopTool()],
-            verbose=True
-        )
-
-    @agent
     def exploratory_data_analyst(self) -> Agent:
         return Agent(
             allow_delegation=False,
             config=self.agents_config['exploratory_data_analyst'],
             llm=self.openai_llm,
-            tools=[DirectoryReadTool(), PWDTool(), YDataProfilerTool()],
+            tools=[DirectoryReadTool(), PWDTool(), FileReadTool()],
             verbose=True
         )
 
@@ -78,14 +55,6 @@ class EDACrew:
     @task
     def ydata_download_task(self) -> Task:
         return Task(config=self.tasks_config['ydata_download_task'])
-
-    @task
-    def json_loader_task(self) -> Task:
-        return Task(config=self.tasks_config['json_loader_task'])
-
-    @task
-    def column_selection_task(self) -> Task:
-        return Task(config=self.tasks_config['column_selection_task'])
 
     @task
     def exploratory_data_analysis_task(self) -> Task:

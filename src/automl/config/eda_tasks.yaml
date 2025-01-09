@@ -16,33 +16,17 @@ ydata_download_task:
   expected_output: Absolute path of file location. No words before of after that.
   agent: dataset_acquisition_specialist
 
-json_loader_task:
-  description: Read and parse a local JSON file, validating its structure and returning the parsed content
-  expected_output: > 
-    A parsed JSON object containing the file's contents, with error messages if file access or parsing fails.
-  agent: data_loader_agent
-
-column_selection_task:
-  description: >
-    Use the CsvPreview tool to read the first 5 rows, and extract all the column names.
-    After that, use the HumanInTheLoopTool to get feedback on column selection.
-  expected_output: A list of selected column names
-  agent: human_feedback_specialist
-  context:
-    - dataset_acquisition_task
-
 exploratory_data_analysis_task:
   description: >
-    Analyze the provided dataset for the extracted columns using the YDataProfilingTool.
-    Generate a comprehensive natural language report.
+    {json_filepath} Analyze the provided JSON and extract meaningful insights.
+    User input: {user_input}
+    ONLY focus on the attributes the user wants more information about.
+    Generate a *very* concise natural language report.
   expected_output: >
-    A detailed natural language report that:
+    A *very* concise natural language report that:
     - Presents insights in clear, conversational language
     - Highlights the most important findings first
     - Explains technical concepts in accessible terms
     - Provides context for why certain insights matter
     - Includes specific examples from the data
-    - Makes actionable recommendations
   agent: exploratory_data_analyst
-  context:
-    - column_selection_task

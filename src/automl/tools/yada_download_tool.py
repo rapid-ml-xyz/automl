@@ -1,8 +1,26 @@
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
-import pandas as pd
 from ydata_profiling import ProfileReport
+import json
+import pandas as pd
+
+
+def remove_fields(data):
+    if isinstance(data, dict):
+        cleaned = {}
+        for key, value in data.items():
+            if key in ['histogram', 'length_histogram', 'histogram_length', 'character_counts',
+                       'category_alias_values', 'block_alias_values', 'block_alias_char_counts',
+                       'script_char_counts', 'category_alias_counts', 'category_alias_char_counts',
+                       'package', 'value_counts_without_nan', 'value_counts_index_sorted']:
+                continue
+            cleaned[key] = remove_fields(value)
+        return cleaned
+    elif isinstance(data, list):
+        return [remove_fields(item) for item in data]
+    else:
+        return data
 
 
 class YDataDownloadInput(BaseModel):
@@ -24,10 +42,12 @@ class YDataDownloadTool(BaseTool):
         try:
             df = pd.read_csv(filepath)
             profile = ProfileReport(df, minimal=True)
-            report_json = profile.to_json()
+            report = profile.to_json()
+            report_json = json.loads(report)
+            truncated_report_json = remove_fields(report_json)
 
             with open(output_path, 'w') as f:
-                f.write(report_json)
+                json.dump(truncated_report_json, f, indent=4, sort_keys=False)
             return f"Profile report successfully saved to {output_path}"
 
         except Exception as e:
