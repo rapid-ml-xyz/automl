@@ -4,6 +4,8 @@ from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import FileReadTool
 from .tools import (
+    CsvPreviewTool,
+    DataVisualizationTool,
     DirectoryReadTool,
     FileOperationTool,
     KaggleDownloadTool,
@@ -44,7 +46,18 @@ class EDACrew:
             allow_delegation=False,
             config=self.agents_config['exploratory_data_analyst'],
             llm=self.openai_llm,
-            tools=[DirectoryReadTool(), PWDTool(), FileReadTool()],
+            tools=[DirectoryReadTool(), FileReadTool(), PWDTool()],
+            verbose=True
+        )
+
+    @agent
+    def visualization_agent(self) -> Agent:
+        return Agent(
+            allow_delegation=False,
+            config=self.agents_config['visualization_agent'],
+            llm=self.openai_llm,
+            tools=[CsvPreviewTool(), DataVisualizationTool(), DirectoryReadTool(),
+                   FileReadTool(), PWDTool()],
             verbose=True
         )
 
@@ -59,6 +72,10 @@ class EDACrew:
     @task
     def exploratory_data_analysis_task(self) -> Task:
         return Task(config=self.tasks_config['exploratory_data_analysis_task'])
+
+    @task
+    def visualization_task(self) -> Task:
+        return Task(config=self.tasks_config['visualization_task'])
 
     @crew
     def crew(self) -> Crew:

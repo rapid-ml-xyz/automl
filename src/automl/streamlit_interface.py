@@ -1,5 +1,5 @@
 import streamlit as st
-from .eda_flow import DownloadFlow, ExplorationFlow
+from .eda_flow import DownloadFlow, ExplorationFlow, VisualizationFlow
 
 
 def setup_page():
@@ -48,6 +48,17 @@ def run_reporting_flow(user_input) -> str:
     return summary
 
 
+def run_visualization_flow(user_input):
+    inputs = {
+        'json_filepath': st.session_state.json_path,
+        'user_input': user_input
+    }
+    visualization_flow = VisualizationFlow()
+
+    with st.spinner("Running data exploration..."):
+        visualization_flow.kickoff(inputs=inputs)
+
+
 class StreamlitInterface:
     def __init__(self):
         setup_page()
@@ -76,9 +87,9 @@ class StreamlitInterface:
         report = run_reporting_flow(query)
         st.session_state.reports.append(report)
 
-        import plotly.express as px
-        fig = px.line(x=[1, 2, 3], y=[1, 2, 3], title=f"Analysis for: {query}")
-        st.session_state.visualizations.append(fig)
+        run_visualization_flow(query)
+        # if visualizations:
+        #     st.session_state.visualizations.extend(visualizations)
 
     def explore(self, action: str):
         """Main exploration interface"""

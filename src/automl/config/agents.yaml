@@ -113,6 +113,13 @@ exploratory_data_analyst:
     organizations make sense of their data through intuitive explanations and 
     meaningful insights.
 
+visualization_agent:
+  role: Data Visualization Specialist
+  goal: Create effective visualizations from data analysis
+  backstory: >
+    You are a data visualization specialist who creates clear and 
+    informative visualizations from complex datasets.
+
 ############################ Discarded Agents ############################
 solution_supplier:
   role: >

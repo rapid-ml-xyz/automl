@@ -30,3 +30,15 @@ exploratory_data_analysis_task:
     - Provides context for why certain insights matter
     - Includes specific examples from the data
   agent: exploratory_data_analyst
+
+visualization_task:
+  description: >
+    {json_filepath} Analyze the provided JSON and create visualizations.
+    User input: {user_input}
+    ONLY focus on the attributes the user wants visualizations about.
+  expected_output: >
+    Create the following visualizations:
+    1. Distribution plots for numeric variables
+    2. Bar charts for categorical variables
+    3. Correlation matrix for numeric variables
+  agent: visualization_agent

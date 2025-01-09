@@ -47,3 +47,21 @@ class ExplorationFlow(Flow):
             verbose=True
         )
         return crew.kickoff(inputs=self.state)
+
+
+class VisualizationFlow(Flow):
+    """Flow for visualization on the saved dataset"""
+
+    def __init__(self):
+        self.eda_crew = EDACrew()
+        super().__init__()
+
+    @start()
+    def visualization_flow(self):
+        crew = Crew(
+            agents=[self.eda_crew.visualization_agent()],
+            tasks=[self.eda_crew.visualization_task()],
+            process=Process.sequential,
+            verbose=True
+        )
+        return crew.kickoff(inputs=self.state)
