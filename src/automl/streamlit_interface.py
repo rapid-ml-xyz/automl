@@ -5,7 +5,7 @@ from .eda_flow import DownloadFlow, ExplorationFlow
 def setup_page():
     """Initialize Streamlit page configuration"""
     st.set_page_config(
-        page_title="KaggleAutoML Explorer",
+        page_title="RapidML EDA",
         page_icon="📊",
         layout="wide"
     )
