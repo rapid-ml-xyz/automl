@@ -1,5 +1,5 @@
 import sys
-from src.automl.streamlit_interface import StreamlitInterface
+from src.automl.st_eda_interface import StreamlitInterface
 
 
 def main():

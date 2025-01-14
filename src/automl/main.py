@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import warnings
 import argparse
-from .streamlit_interface import StreamlitInterface
+from .st_eda_interface import StreamlitInterface
 from .few_shot_crew import FewShot
 from .zero_shot_crew import ZeroShot
 
